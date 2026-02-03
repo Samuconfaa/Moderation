@@ -5,11 +5,14 @@ import it.samuconfaa.moderation.managers.DbManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ModerationCommand implements CommandExecutor {
+public class ModerationCommand implements CommandExecutor, TabCompleter {
 
     private final Moderation plugin;
 
@@ -95,5 +98,35 @@ public class ModerationCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] args) {
+        if (args.length == 1) {
+            List<String> completions = new ArrayList<>();
+
+
+            List<String> commands = List.of("reload", "add", "remove", "check");
+
+
+            List<String> allowed = new ArrayList<>();
+            for (String cmd : commands) {
+                switch (cmd) {
+                    case "reload", "add", "remove" -> {
+                        if (sender.hasPermission("moderation.admin")) allowed.add(cmd);
+                    }
+                    case "check" -> {
+                        if (sender.hasPermission("moderation.check")) allowed.add(cmd);
+                    }
+                }
+            }
+
+            org.bukkit.util.StringUtil.copyPartialMatches(args[0], allowed, completions);
+            completions.sort(String::compareToIgnoreCase);
+            return completions;
+        }
+
+        return List.of();
     }
 }
