@@ -1,0 +1,14 @@
+database:
+  name: "database.db"
+
+messages:
+  no-permission: "&cYou don't have permission to do that!"
+  addWord: "&aSuccessfully added to the blacklist!"
+  removeWord: "&aSuccessfully removed from the blacklist!"
+  alreadyBlacklisted: "&cThis word is already blacklisted!"
+  notBlacklisted: "&cThis word is not blacklisted!"
+  reload: "&aSuccessfully reloaded the config!"
+  usage: "&cUsage: /moderation <add|remove|check> <word>"
+  noWord: "&cPlease specify a word!"
+  blacklisted: "&cThis word is blacklisted!"
+  onlyPlayers: "&cOnly players can use this command!"

@@ -1,0 +1,4 @@
+name: Moderation
+version: '1.0'
+main: it.samuconfaa.moderation.Moderation
+api-version: '1.21'
