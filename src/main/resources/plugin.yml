@@ -1,4 +1,22 @@
 name: Moderation
-version: '1.0'
 main: it.samuconfaa.moderation.Moderation
-api-version: '1.21'
+version: 1.0.0
+api-version: 1.21
+description: "Plugin per moderazione chat: blacklist parole e controllo CAPS."
+author: samuconfaa
+
+commands:
+  moderation:
+    description: "Comando principale per gestire la moderazione chat"
+    usage: "/moderation <add|remove|check|reload> [word]"
+
+permissions:
+  moderation.admin:
+    description: "Permette di usare tutti i sottocomandi admin (add, remove, reload)"
+    default: op
+    children:
+      moderation.check: true
+
+  moderation.check:
+    description: "Permette di usare il sottocomando check"
+    default: true

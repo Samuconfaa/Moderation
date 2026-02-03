@@ -31,8 +31,13 @@ public class ModerationCommand implements CommandExecutor {
 
         // -----------------------------------------------
         if (sub.equals("check")) {
-            if (args.length < 2) {
-                sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
+            if(sender.hasPermission("moderation.check")) {
+                if (args.length < 2) {
+                    sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
+                    return true;
+                }
+            }else{
+                sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
                 return true;
             }
 
