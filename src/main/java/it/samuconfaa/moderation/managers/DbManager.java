@@ -115,13 +115,20 @@ public class DbManager {
         });
     }
 
-    public static void containsBlacklistedWordCached(String message, Moderation plugin, Consumer<Boolean> callback) {
+    public static void containsBlacklistedWordCachedAsync(String message, Moderation plugin, Consumer<Boolean> callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String msg = message.toLowerCase();
             boolean found = BLACKLIST.stream().anyMatch(msg::contains);
 
             Bukkit.getScheduler().runTask(plugin, () -> callback.accept(found));
         });
+    }
+
+    public static void containsBlacklistedWordCached(String message, Moderation plugin, Consumer<Boolean> callback) {
+        String msg = message.toLowerCase();
+        boolean found = BLACKLIST.stream().anyMatch(msg::contains);
+
+        callback.accept(found);
     }
 
     /*

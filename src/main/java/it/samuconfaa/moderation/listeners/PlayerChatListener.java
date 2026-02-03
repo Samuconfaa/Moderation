@@ -30,6 +30,7 @@ public class PlayerChatListener implements Listener {
     }
 
     private void capsFilter(AsyncPlayerChatEvent event){
+        if (event.isCancelled()) return;
         String message = event.getMessage();
         Player player = event.getPlayer();
         List<String> names = plugin.getCachedPlayerNames();
@@ -41,21 +42,15 @@ public class PlayerChatListener implements Listener {
 
         double caps = capsPercentage(message, names);
         if (caps > plugin.getConfigManager().getMaxCaps()) {
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                if (event.isCancelled()) return;
-                event.setCancelled(true);
-                player.sendMessage(plugin.getConfigManager().getNoCapsMessage());
-            });
+            event.setCancelled(true);
+            player.sendMessage(plugin.getConfigManager().getNoCapsMessage());
             return;
         }
 
         DbManager.containsBlacklistedWordCached(message, plugin, found -> {
             if (found) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    if (event.isCancelled()) return;
-                    event.setCancelled(true);
-                    player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
-                });
+                event.setCancelled(true);
+                player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
             }
         });
     }
