@@ -79,8 +79,10 @@ public class ConfigManager {
     }
 
     private String getConfigString(String path) {
-        return color(plugin.getConfig().getString(path));
+        String value = plugin.getConfig().getString(path, "");
+        return ChatColor.translateAlternateColorCodes('&', value);
     }
+
 
     private List<String> colorList(List<String> list) {
         return list.stream().map(this::color).toList();

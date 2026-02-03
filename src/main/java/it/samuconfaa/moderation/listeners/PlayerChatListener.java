@@ -21,7 +21,12 @@ public class PlayerChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
+        checkTime(event);
         capsFilter(event);
+    }
+
+    private void checkTime(AsyncPlayerChatEvent event) {
+
     }
 
     private void capsFilter(AsyncPlayerChatEvent event){

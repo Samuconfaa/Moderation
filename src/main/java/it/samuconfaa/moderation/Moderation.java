@@ -8,7 +8,9 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class Moderation extends JavaPlugin {
@@ -20,10 +22,14 @@ public final class Moderation extends JavaPlugin {
     @Getter
     private List<String> cachedPlayerNames;
 
+    @Getter
+    private HashMap<UUID, Long> chatCooldown = new HashMap<>();
+
     @Override
     public void onEnable() {
         instance = this;
-
+        saveDefaultConfig();
+        
         configManager = new ConfigManager(this);
         configManager.load();
         getCommand("moderation").setExecutor(new ModerationCommand(this));
@@ -47,7 +53,7 @@ public final class Moderation extends JavaPlugin {
     }
 
     private void startPlayerCacheTask() {
-        long check = getConfigManager().getIntervalCheck();
+        long check = getConfigManager().getIntervalCheck() *20;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             cachedPlayerNames = Bukkit.getOnlinePlayers().stream()
                     .map(p -> p.getName().toLowerCase())

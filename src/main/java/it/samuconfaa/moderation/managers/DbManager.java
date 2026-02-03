@@ -16,7 +16,7 @@ public class DbManager {
 
     private static HikariDataSource dataSource;
     private static final Set<String> BLACKLIST = ConcurrentHashMap.newKeySet();
-    ;
+
 
     public static void init(Moderation plugin) {
         File dataFolder = plugin.getDataFolder();
