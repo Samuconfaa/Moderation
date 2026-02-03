@@ -79,22 +79,26 @@ public class PlayerChatListener implements Listener {
     }
 
     private double capsPercentage(String message, List<String> names) {
+        boolean[] ignore = new boolean[message.length()];
 
-        String clean = message.toLowerCase();
+        String lowerMsg = message.toLowerCase();
         for (String name : names) {
-            clean = clean.replace(name, "");
+            int index = 0;
+            while ((index = lowerMsg.indexOf(name, index)) != -1) {
+                for (int i = index; i < index + name.length() && i < ignore.length; i++) {
+                    ignore[i] = true;
+                }
+                index += name.length();
+            }
         }
 
         int caps = 0;
         int letters = 0;
 
         for (int i = 0; i < message.length(); i++) {
-            char original = message.charAt(i);
-            char filtered = clean.charAt(i);
-
-            if (Character.isLetter(filtered)) {
+            if (!ignore[i] && Character.isLetter(message.charAt(i))) {
                 letters++;
-                if (Character.isUpperCase(original)) {
+                if (Character.isUpperCase(message.charAt(i))) {
                     caps++;
                 }
             }

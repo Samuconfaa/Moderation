@@ -2,12 +2,15 @@ package it.samuconfaa.moderation;
 
 import it.samuconfaa.moderation.commands.ModerationCommand;
 import it.samuconfaa.moderation.listeners.PlayerChatListener;
+import it.samuconfaa.moderation.listeners.PlayerQuitListener;
 import it.samuconfaa.moderation.managers.ConfigManager;
 import it.samuconfaa.moderation.managers.DbManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +23,7 @@ public final class Moderation extends JavaPlugin {
     private ConfigManager configManager;
 
     @Getter
-    private List<String> cachedPlayerNames;
+    private List<String> cachedPlayerNames = new ArrayList<>();
 
     @Getter
     private final HashMap<UUID, Long> chatCooldown = new HashMap<>();
@@ -34,6 +37,7 @@ public final class Moderation extends JavaPlugin {
         configManager.load();
         getCommand("moderation").setExecutor(new ModerationCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         DbManager.init(this);
         startPlayerCacheTask();
 

@@ -35,7 +35,6 @@ public class DbManager {
         dataSource = new HikariDataSource(config);
 
         createTables(plugin);
-        loadBlacklist(plugin);
     }
 
     public static Connection getConnection() throws SQLException {
@@ -60,6 +59,9 @@ public class DbManager {
                  var stmt = conn.createStatement()) {
 
                 stmt.execute(sql);
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                    loadBlacklist(plugin);
+                });
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,7 +98,7 @@ public class DbManager {
         });
      */
 
-    public static void loadBlacklist(Moderation plugin) {
+    public static void loadBlacklistAsync(Moderation plugin) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String sql = "SELECT word FROM blacklist_words";
 
@@ -113,6 +115,21 @@ public class DbManager {
                 e.printStackTrace();
             }
         });
+    }
+
+    private static void loadBlacklist(Moderation plugin) {
+        String sql = "SELECT word FROM blacklist_words";
+        try (var conn = getConnection();
+             var stmt = conn.createStatement();
+             var rs = stmt.executeQuery(sql)) {
+
+            BLACKLIST.clear();
+            while (rs.next()) {
+                BLACKLIST.add(rs.getString("word"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void containsBlacklistedWordCachedAsync(String message, Moderation plugin, Consumer<Boolean> callback) {
