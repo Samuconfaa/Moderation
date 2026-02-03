@@ -4,12 +4,21 @@ import it.samuconfaa.moderation.commands.ModerationCommand;
 import it.samuconfaa.moderation.listeners.PlayerChatListener;
 import it.samuconfaa.moderation.managers.ConfigManager;
 import it.samuconfaa.moderation.managers.DbManager;
+import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Moderation extends JavaPlugin {
 
     private static Moderation instance;
+    @Getter
     private ConfigManager configManager;
+
+    @Getter
+    private List<String> cachedPlayerNames;
 
     @Override
     public void onEnable() {
@@ -20,6 +29,7 @@ public final class Moderation extends JavaPlugin {
         getCommand("moderation").setExecutor(new ModerationCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
         DbManager.init(this);
+        startPlayerCacheTask();
 
 
         getLogger().info("-------------------------------");
@@ -36,7 +46,13 @@ public final class Moderation extends JavaPlugin {
 
     }
 
-    public ConfigManager getConfigManager(){
-        return configManager;
+    private void startPlayerCacheTask() {
+        long check = getConfigManager().getIntervalCheck();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            cachedPlayerNames = Bukkit.getOnlinePlayers().stream()
+                    .map(p -> p.getName().toLowerCase())
+                    .collect(Collectors.toList());
+        }, 0L, check);
     }
+
 }

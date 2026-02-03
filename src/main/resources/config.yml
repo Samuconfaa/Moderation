@@ -1,6 +1,8 @@
 database:
   name: "database.db"
 
+check-interval: 30 #seconds
+
 caps-options:
   max-caps: 50 #%
   min-letters: 3

@@ -1,6 +1,7 @@
 package it.samuconfaa.moderation.managers;
 
 import it.samuconfaa.moderation.Moderation;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 
 import java.util.List;
@@ -14,22 +15,38 @@ public class ConfigManager {
     }
 
     //--------------------------------------------------------------------------------------------
+    @Getter
     private String DbName;
-
+    @Getter
     private String noPermissionMessage;
+    @Getter
     private String addWordMessage;
+    @Getter
     private String removeWordMessage;
+    @Getter
     private String notBlacklistedMessage;
+    @Getter
     private String reloadMessage;
+    @Getter
     private String usageMessage;
+    @Getter
     private String noWordMessage;
+    @Getter
     private String blacklistedMessage;
+    @Getter
     private String onlyPlayerMessage;
+    @Getter
     private String noCapsMessage;
+    @Getter
     private List<String> helpMessage;
 
+    @Getter
     private int maxCaps;
+    @Getter
     private int minLetters;
+
+    @Getter
+    private long intervalCheck;
     //--------------------------------------------------------------------------------------------
 
     public void load() {
@@ -52,6 +69,8 @@ public class ConfigManager {
         maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
         minLetters = plugin.getConfig().getInt("caps-options.min-letters");
 
+        intervalCheck = plugin.getConfig().getLong("check-interval");
+
     }
 
     //--------------------------------------------------------------------------------------------
@@ -67,22 +86,6 @@ public class ConfigManager {
         return list.stream().map(this::color).toList();
     }
 
-    //--------------------------------------------------------------------------------------------
-    public String getDbName() { return DbName; }
 
-    public String getNoPermissionMessage() { return noPermissionMessage; }
-    public String getAddWordMessage() { return addWordMessage; }
-    public String getRemoveWordMessage() { return removeWordMessage; }
-    public String getNotBlacklistedMessage() { return notBlacklistedMessage; }
-    public String getReloadMessage() { return reloadMessage; }
-    public String getUsageMessage() { return usageMessage; }
-    public String getNoWordMessage() { return noWordMessage; }
-    public String getBlacklistedMessage() { return blacklistedMessage; }
-    public String getOnlyPlayerMessage() { return onlyPlayerMessage; }
-    public String getNoCapsMessage() { return noCapsMessage; }
-    public List<String> getHelpMessage() { return helpMessage; }
-
-    public int getMaxCaps() { return maxCaps; }
-    public int getMinLetters() { return maxCaps; }
 
 }

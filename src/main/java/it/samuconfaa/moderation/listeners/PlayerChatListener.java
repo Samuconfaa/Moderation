@@ -21,17 +21,19 @@ public class PlayerChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
+        capsFilter(event);
+    }
+
+    private void capsFilter(AsyncPlayerChatEvent event){
         String message = event.getMessage();
         Player player = event.getPlayer();
+        List<String> names = plugin.getCachedPlayerNames();
+
         int letters = countLetters(message);
         if (letters <= plugin.getConfigManager().getMinLetters()) {
             return;
         }
 
-        List<String> names = Bukkit.getOnlinePlayers()
-                .stream()
-                .map(p -> p.getName().toLowerCase())
-                .toList();
         double caps = capsPercentage(message, names);
         if (caps > plugin.getConfigManager().getMaxCaps()) {
             Bukkit.getScheduler().runTask(plugin, () -> {
