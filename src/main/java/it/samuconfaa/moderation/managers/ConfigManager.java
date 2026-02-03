@@ -17,6 +17,9 @@ public class ConfigManager {
     //--------------------------------------------------------------------------------------------
     @Getter
     private String DbName;
+
+    @Getter
+    private String prefix;
     @Getter
     private String noPermissionMessage;
     @Getter
@@ -54,6 +57,7 @@ public class ConfigManager {
 
         DbName = getConfigString("database.name");
 
+        prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.prefix"));
         noPermissionMessage = getConfigString("messages.no-permission");
         addWordMessage = getConfigString("messages.addWord");
         removeWordMessage = getConfigString("messages.removeWord");
@@ -80,14 +84,11 @@ public class ConfigManager {
 
     private String getConfigString(String path) {
         String value = plugin.getConfig().getString(path, "");
-        return ChatColor.translateAlternateColorCodes('&', value);
+        return prefix + ChatColor.translateAlternateColorCodes('&', value);
     }
-
 
     private List<String> colorList(List<String> list) {
         return list.stream().map(this::color).toList();
     }
-
-
 
 }
