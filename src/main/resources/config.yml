@@ -22,11 +22,13 @@ messages:
   onlyPlayers: "&cOnly players can use this command!"
   noCaps: "&cThis message has too many caps!"
   help:
-    - "&g========== MODERATION HELP =========="
+    - "&6========== MODERATION HELP =========="
     - ""
     - "&a/moderation add <word>  &7- Add a word to the blacklist"
     - "&a/moderation remove <word>  &7- Remove a word from the blacklist"
     - "&a/moderation check <word>  &7- Check if a word is blacklisted"
     - "&a/moderation reload  &7- Reload the config"
     - ""
-    - "&g====================================="
+    - "&6====================================="
+  staff-segnalation: "&c%player% has sent a message with %word%"
+

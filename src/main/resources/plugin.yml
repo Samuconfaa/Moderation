@@ -16,6 +16,11 @@ permissions:
     default: op
     children:
       moderation.check: true
+      moderation.staff: true
+
+  moderation.staff:
+    description: "Per ricevere le segnalazioni"
+    default: op
 
   moderation.check:
     description: "Permette di usare il sottocomando check"

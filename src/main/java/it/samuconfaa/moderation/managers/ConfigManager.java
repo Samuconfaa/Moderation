@@ -44,6 +44,8 @@ public class ConfigManager {
     private String noDelayMessage;
     @Getter
     private List<String> helpMessage;
+    @Getter
+    private String staffMessage;
 
     @Getter
     private int maxCaps;
@@ -74,6 +76,7 @@ public class ConfigManager {
         noCapsMessage = getConfigString("messages.noCaps");
         noDelayMessage = getConfigString("messages.noDelay");
         helpMessage = colorList(plugin.getConfig().getStringList("messages.help"));
+        staffMessage = getConfigString("messages.staff-segnalation");
 
         maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
         minLetters = plugin.getConfig().getInt("caps-options.min-letters");

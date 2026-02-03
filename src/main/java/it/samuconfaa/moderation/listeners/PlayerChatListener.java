@@ -3,21 +3,20 @@ package it.samuconfaa.moderation.listeners;
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class PlayerChatListener implements Listener {
     private Moderation plugin;
     public PlayerChatListener(Moderation plugin) {
         this.plugin = plugin;
     }
-
-
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
@@ -64,8 +63,17 @@ public class PlayerChatListener implements Listener {
             if (found) {
                 event.setCancelled(true);
                 player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
+                sendStaffMessage(message, player);
             }
         });
+    }
+
+    private void sendStaffMessage(String message, Player player) {
+        List<Player> staff = Bukkit.getOnlinePlayers().stream()
+                .filter(p -> p.hasPermission("moderation.staff"))
+                .collect(Collectors.toList());
+        staff.forEach(p -> p.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f));
+        staff.forEach(p -> p.sendMessage(plugin.getConfigManager().getStaffMessage().replace("%player%", player.getName()).replace("%word%", message)));
     }
 
     private int countLetters(String message) {
@@ -106,6 +114,4 @@ public class PlayerChatListener implements Listener {
 
         return letters == 0 ? 0 : (caps * 100.0) / letters;
     }
-
-
 }
