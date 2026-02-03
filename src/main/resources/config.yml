@@ -31,4 +31,6 @@ messages:
     - ""
     - "&6====================================="
   staff-segnalation: "&c%player% has sent a message with %word%"
+  staff-sign-segnalation: "&c%player% has place a sign with '%word%' in %location%"
+
 
