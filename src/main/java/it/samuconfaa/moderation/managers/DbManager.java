@@ -132,20 +132,27 @@ public class DbManager {
         }
     }
 
-    public static void containsBlacklistedWordCachedAsync(String message, Moderation plugin, Consumer<Boolean> callback) {
+    public static void containsBlacklistedWordCachedAsync(String message, Moderation plugin, Consumer<String> callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String msg = message.toLowerCase();
-            boolean found = BLACKLIST.stream().anyMatch(msg::contains);
+            String foundWord = BLACKLIST.stream()
+                    .filter(msg::contains)
+                    .findFirst()
+                    .orElse(null);
 
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(found));
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(foundWord));
         });
     }
 
-    public static void containsBlacklistedWordCached(String message, Moderation plugin, Consumer<Boolean> callback) {
+    public static String containsBlacklistedWordCached(String message, Moderation plugin) {
         String msg = message.toLowerCase();
-        boolean found = BLACKLIST.stream().anyMatch(msg::contains);
 
-        callback.accept(found);
+        String foundWord = BLACKLIST.stream()
+                .filter(msg::contains)
+                .findFirst()
+                .orElse(null);
+
+        return foundWord;
     }
 
     /*
