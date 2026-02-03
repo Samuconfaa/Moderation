@@ -1,5 +1,7 @@
 package it.samuconfaa.moderation;
 
+import it.samuconfaa.moderation.commands.ModerationCommand;
+import it.samuconfaa.moderation.listeners.PlayerChatListener;
 import it.samuconfaa.moderation.managers.ConfigManager;
 import it.samuconfaa.moderation.managers.DbManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +17,10 @@ public final class Moderation extends JavaPlugin {
 
         configManager = new ConfigManager(this);
         configManager.load();
+        getCommand("moderation").setExecutor(new ModerationCommand(this));
+        getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
         DbManager.init(this);
+
 
         getLogger().info("-------------------------------");
         getLogger().info("Moderation plugin enabled!");

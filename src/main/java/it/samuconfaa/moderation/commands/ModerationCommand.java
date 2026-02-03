@@ -1,48 +1,94 @@
 package it.samuconfaa.moderation.commands;
 
 import it.samuconfaa.moderation.Moderation;
+import it.samuconfaa.moderation.managers.DbManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class ModerationCommand implements CommandExecutor {
-    private Moderation plugin;
+
+    private final Moderation plugin;
+
     public ModerationCommand(Moderation plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] args) {
-        if(args.length == 0){
-            if(sender instanceof Player p){
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
 
+        if (args.length == 0) {
+            for (String line : plugin.getConfigManager().getHelpMessage()) {
+                sender.sendMessage(line);
             }
             return true;
-        }else if(args.length == 1){
-            String a = args[0];
-            if(a.equalsIgnoreCase("check")){
-                //controllo parola
+        }
+
+        String sub = args[0].toLowerCase();
+
+        // -----------------------------------------------
+        if (sub.equals("check")) {
+            if (args.length < 2) {
+                sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
                 return true;
             }
 
-            if(sender.hasPermission("moderation.admin")){
-                if(a.equalsIgnoreCase("reload")){
-                    //reload config
-                    return true;
-                }else if (a.equalsIgnoreCase("add")){
-                    //aggiungi parole
-                    return true;
-                }else if (a.equalsIgnoreCase("remove")){
-                    //rimuovi parole
+            String word = args[1];
+            DbManager.isBlacklisted(word, plugin, isBlocked -> {
+                if (isBlocked) {
+                    sender.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
+                } else {
+                    sender.sendMessage(plugin.getConfigManager().getNotBlacklistedMessage());
+                }
+            });
+
+            return true;
+        }
+
+        // -----------------------------------------------
+        if (!sender.hasPermission("moderation.admin")) {
+            sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+            return true;
+        }
+
+        switch (sub) {
+            case "reload":
+                plugin.getConfigManager().load();
+                sender.sendMessage(plugin.getConfigManager().getReloadMessage());
+                break;
+
+            case "add":
+                if (args.length < 2) {
+                    sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
                     return true;
                 }
-            }else{
-                //non hai i permessi
-                return true;
-            }
+
+                String addWord = args[1];
+                DbManager.addWord(addWord, plugin, () ->
+                        sender.sendMessage(plugin.getConfigManager().getAddWordMessage())
+                );
+                break;
+
+            case "remove":
+                if (args.length < 2) {
+                    sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
+                    return true;
+                }
+
+                String removeWord = args[1];
+                DbManager.removeWord(removeWord, plugin, () ->
+                        sender.sendMessage(plugin.getConfigManager().getRemoveWordMessage())
+                );
+                break;
+
+            default:
+                sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                break;
         }
-        return false;
+
+        return true;
     }
 }

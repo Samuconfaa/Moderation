@@ -3,6 +3,8 @@ package it.samuconfaa.moderation.managers;
 import it.samuconfaa.moderation.Moderation;
 import org.bukkit.ChatColor;
 
+import java.util.List;
+
 public class ConfigManager {
 
     private final Moderation plugin;
@@ -17,13 +19,13 @@ public class ConfigManager {
     private String noPermissionMessage;
     private String addWordMessage;
     private String removeWordMessage;
-    private String alreadyBlacklistedMessage;
     private String notBlacklistedMessage;
     private String reloadMessage;
     private String usageMessage;
     private String noWordMessage;
     private String blacklistedMessage;
     private String onlyPlayerMessage;
+    private List<String> helpMessage;
 
     //--------------------------------------------------------------------------------------------
 
@@ -35,13 +37,14 @@ public class ConfigManager {
         noPermissionMessage = getConfigString("messages.no-permission");
         addWordMessage = getConfigString("messages.addWord");
         removeWordMessage = getConfigString("messages.removeWord");
-        alreadyBlacklistedMessage = getConfigString("messages.alreadyBlacklisted");
         notBlacklistedMessage = getConfigString("messages.notBlacklisted");
         reloadMessage = getConfigString("messages.reload");
         usageMessage = getConfigString("messages.usage");
         noWordMessage = getConfigString("messages.noWord");
         blacklistedMessage = getConfigString("messages.blacklisted");
         onlyPlayerMessage = getConfigString("messages.onlyPlayer");
+        helpMessage = colorList(plugin.getConfig().getStringList("messages.help"));
+
 
     }
 
@@ -54,18 +57,22 @@ public class ConfigManager {
         return color(plugin.getConfig().getString(path));
     }
 
+    private List<String> colorList(List<String> list) {
+        return list.stream().map(this::color).toList();
+    }
+
     //--------------------------------------------------------------------------------------------
     public String getDbName() { return DbName; }
 
     public String getNoPermissionMessage() { return noPermissionMessage; }
     public String getAddWordMessage() { return addWordMessage; }
     public String getRemoveWordMessage() { return removeWordMessage; }
-    public String getAlreadyBlacklistedMessage() { return alreadyBlacklistedMessage; }
     public String getNotBlacklistedMessage() { return notBlacklistedMessage; }
     public String getReloadMessage() { return reloadMessage; }
     public String getUsageMessage() { return usageMessage; }
     public String getNoWordMessage() { return noWordMessage; }
     public String getBlacklistedMessage() { return blacklistedMessage; }
     public String getOnlyPlayerMessage() { return onlyPlayerMessage; }
+    public List<String> getHelpMessage() { return helpMessage; }
 
 }

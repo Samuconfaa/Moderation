@@ -89,7 +89,7 @@ public class DbManager {
     }
 
     /*
-        DbManager.isBlacklistedAsync("cazzo", plugin, isBlocked -> {
+        DbManager.isBlacklisted("cazzo", plugin, isBlocked -> {
             if (isBlocked) {
                 //parola vietata
             }
@@ -120,7 +120,6 @@ public class DbManager {
             String msg = message.toLowerCase();
             boolean found = BLACKLIST.stream().anyMatch(msg::contains);
 
-            // Torni sul main thread per eseguire il callback
             Bukkit.getScheduler().runTask(plugin, () -> callback.accept(found));
         });
     }
