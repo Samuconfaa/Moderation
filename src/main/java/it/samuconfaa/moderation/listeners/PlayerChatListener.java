@@ -26,7 +26,20 @@ public class PlayerChatListener implements Listener {
     }
 
     private void checkTime(AsyncPlayerChatEvent event) {
-
+        Player player = event.getPlayer();
+        if (plugin.getChatCooldown().containsKey(player.getUniqueId())) {
+            long millis = plugin.getChatCooldown().get(player.getUniqueId());
+            long now = System.currentTimeMillis();
+            long delay = plugin.getConfigManager().getMessageDelay();
+            long diff = now - millis;
+            if(diff < delay){
+                int seconds = (int) (delay - diff) / 1000;
+                player.sendMessage(plugin.getConfigManager().getNoDelayMessage().replace("%time%", seconds+""));
+                event.setCancelled(true);
+            }
+        }else{
+            plugin.getChatCooldown().put(player.getUniqueId(), System.currentTimeMillis());
+        }
     }
 
     private void capsFilter(AsyncPlayerChatEvent event){

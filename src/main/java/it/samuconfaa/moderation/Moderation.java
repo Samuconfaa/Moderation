@@ -23,13 +23,13 @@ public final class Moderation extends JavaPlugin {
     private List<String> cachedPlayerNames;
 
     @Getter
-    private HashMap<UUID, Long> chatCooldown = new HashMap<>();
+    private final HashMap<UUID, Long> chatCooldown = new HashMap<>();
 
     @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-        
+
         configManager = new ConfigManager(this);
         configManager.load();
         getCommand("moderation").setExecutor(new ModerationCommand(this));

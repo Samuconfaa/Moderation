@@ -41,12 +41,16 @@ public class ConfigManager {
     @Getter
     private String noCapsMessage;
     @Getter
+    private String noDelayMessage;
+    @Getter
     private List<String> helpMessage;
 
     @Getter
     private int maxCaps;
     @Getter
     private int minLetters;
+    @Getter
+    private long messageDelay;
 
     @Getter
     private long intervalCheck;
@@ -68,10 +72,12 @@ public class ConfigManager {
         blacklistedMessage = getConfigString("messages.blacklisted");
         onlyPlayerMessage = getConfigString("messages.onlyPlayer");
         noCapsMessage = getConfigString("messages.noCaps");
+        noDelayMessage = getConfigString("messages.noDelay");
         helpMessage = colorList(plugin.getConfig().getStringList("messages.help"));
 
         maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
         minLetters = plugin.getConfig().getInt("caps-options.min-letters");
+        messageDelay = (long) plugin.getConfig().getInt("message-delay") * 1000L;
 
         intervalCheck = plugin.getConfig().getLong("check-interval");
 

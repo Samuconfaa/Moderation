@@ -2,6 +2,7 @@ database:
   name: "database.db"
 
 check-interval: 30 #seconds
+message-delay: 3 #seconds
 
 caps-options:
   max-caps: 50 #%
@@ -9,6 +10,7 @@ caps-options:
 
 messages:
   prefix: "&8[&6Moderation&8] "
+  noDelay: "&cYou must wait %time% seconds before sending a message again!"
   no-permission: "&cYou don't have permission to do that!"
   addWord: "&aSuccessfully added to the blacklist!"
   removeWord: "&aSuccessfully removed from the blacklist!"
