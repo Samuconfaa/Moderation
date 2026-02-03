@@ -1,6 +1,10 @@
 database:
   name: "database.db"
 
+caps-options:
+  max-caps: 50 #%
+  min-letters: 3
+
 messages:
   no-permission: "&cYou don't have permission to do that!"
   addWord: "&aSuccessfully added to the blacklist!"
@@ -11,6 +15,7 @@ messages:
   usage: "&cUsage: /moderation <add|remove|check> <word>"
   noWord: "&cPlease specify a word!"
   onlyPlayers: "&cOnly players can use this command!"
+  noCaps: "&cThis message has too many caps!"
   help:
     - "&g========== MODERATION HELP =========="
     - ""

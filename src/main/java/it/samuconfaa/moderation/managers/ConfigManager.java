@@ -25,8 +25,11 @@ public class ConfigManager {
     private String noWordMessage;
     private String blacklistedMessage;
     private String onlyPlayerMessage;
+    private String noCapsMessage;
     private List<String> helpMessage;
 
+    private int maxCaps;
+    private int minLetters;
     //--------------------------------------------------------------------------------------------
 
     public void load() {
@@ -43,8 +46,11 @@ public class ConfigManager {
         noWordMessage = getConfigString("messages.noWord");
         blacklistedMessage = getConfigString("messages.blacklisted");
         onlyPlayerMessage = getConfigString("messages.onlyPlayer");
+        noCapsMessage = getConfigString("messages.noCaps");
         helpMessage = colorList(plugin.getConfig().getStringList("messages.help"));
 
+        maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
+        minLetters = plugin.getConfig().getInt("caps-options.min-letters");
 
     }
 
@@ -73,6 +79,10 @@ public class ConfigManager {
     public String getNoWordMessage() { return noWordMessage; }
     public String getBlacklistedMessage() { return blacklistedMessage; }
     public String getOnlyPlayerMessage() { return onlyPlayerMessage; }
+    public String getNoCapsMessage() { return noCapsMessage; }
     public List<String> getHelpMessage() { return helpMessage; }
+
+    public int getMaxCaps() { return maxCaps; }
+    public int getMinLetters() { return maxCaps; }
 
 }
