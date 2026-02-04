@@ -20,6 +20,10 @@ public class PlayerChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if(player.hasPermission("moderation.bypass")){
+            return;
+        }
         capsFilter(event);
         if (!event.isCancelled()) {
             checkTime(event);

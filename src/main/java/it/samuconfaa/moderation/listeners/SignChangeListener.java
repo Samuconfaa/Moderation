@@ -27,6 +27,9 @@ public class SignChangeListener implements Listener {
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
+        if(player.hasPermission("moderation.bypass")){
+            return;
+        }
         Location loc = event.getBlock().getLocation();
         StringBuilder fullText = new StringBuilder();
         for (int i = 0; i < event.lines().size(); i++) {

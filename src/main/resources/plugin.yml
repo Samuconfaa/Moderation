@@ -21,6 +21,7 @@ permissions:
       moderation.add: true
       moderation.remove: true
       moderation.history: true
+      moderation.bypass: true
 
   moderation.staff:
     description: "Per ricevere le segnalazioni"
@@ -45,3 +46,7 @@ permissions:
   moderation.check:
     description: "Permette di usare il sottocomando check"
     default: true
+
+  moderation.bypass:
+    description: "Permette di inviare tutti i messaggi senza censure"
+    default: op
