@@ -238,21 +238,21 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String @NotNull [] args) {
+        List<String> completions = new ArrayList<>();
+
         if (args.length == 1) {
-            List<String> completions = new ArrayList<>();
-
             List<String> commands = List.of("reload", "add", "remove", "check", "history");
-
             List<String> allowed = new ArrayList<>();
+
             for (String cmd : commands) {
                 switch (cmd) {
-                    case "reload" ->{
+                    case "reload" -> {
                         if (sender.hasPermission("moderation.reload")) allowed.add(cmd);
                     }
-                    case "add" ->{
+                    case "add" -> {
                         if (sender.hasPermission("moderation.add")) allowed.add(cmd);
                     }
-                    case "remove" ->{
+                    case "remove" -> {
                         if (sender.hasPermission("moderation.remove")) allowed.add(cmd);
                     }
                     case "history" -> {
@@ -269,25 +269,53 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             return completions;
         }
 
-        if (args.length == 2 && args[0].equalsIgnoreCase("history")) {
-            if (sender.hasPermission("moderation.admin")) {
-                List<String> completions = new ArrayList<>();
+        if (args.length == 2) {
+            String subCommand = args[0].toLowerCase();
+
+            if (subCommand.equals("add") && sender.hasPermission("moderation.add")) {
+                List<String> types = List.of("blacklist", "whitelist");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[1], types, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+
+            if (subCommand.equals("remove") && sender.hasPermission("moderation.remove")) {
+                List<String> types = List.of("blacklist", "whitelist");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[1], types, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+
+            if (subCommand.equals("check") && sender.hasPermission("moderation.check")) {
+                List<String> types = List.of("blacklist", "whitelist");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[1], types, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+
+            if (subCommand.equals("history") && sender.hasPermission("moderation.history")) {
                 List<String> playerNames = Bukkit.getOnlinePlayers().stream()
                         .map(org.bukkit.entity.Player::getName)
                         .toList();
-
                 org.bukkit.util.StringUtil.copyPartialMatches(args[1], playerNames, completions);
                 completions.sort(String::compareToIgnoreCase);
                 return completions;
             }
         }
 
-        if (args.length == 3 && args[0].equalsIgnoreCase("history")) {
-            if (sender.hasPermission("moderation.admin")) {
+        if (args.length == 3) {
+            String subCommand = args[0].toLowerCase();
+
+            if ((subCommand.equals("add") || subCommand.equals("remove") || subCommand.equals("check"))) {
+                return List.of();
+            }
+
+            if (subCommand.equals("history") && sender.hasPermission("moderation.history")) {
                 return List.of("5", "10", "20", "50", "100");
             }
         }
 
         return List.of();
     }
+
 }
