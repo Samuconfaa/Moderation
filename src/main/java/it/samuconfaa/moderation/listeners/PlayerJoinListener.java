@@ -17,6 +17,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
         Player p = event.getPlayer();
+        plugin.getCachedPlayerNames().add(p.getName());
         if(p.hasPermission("moderation.admin")){
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if(plugin.isUpdate()){

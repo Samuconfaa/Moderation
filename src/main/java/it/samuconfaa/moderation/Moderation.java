@@ -37,7 +37,7 @@ public final class Moderation extends JavaPlugin {
     private int playerCacheTaskId = -1;
 
     @Getter
-    private final List<String> cachedPlayerNames = new CopyOnWriteArrayList<>();
+    private final Set<String> cachedPlayerNames = ConcurrentHashMap.newKeySet();
 
     @Getter
     private final ConcurrentHashMap<UUID, Long> chatCooldown = new ConcurrentHashMap<>();
@@ -77,25 +77,13 @@ public final class Moderation extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 
         DbManager.init(this);
-        startPlayerCacheTask();
         startCooldownCleanupTask();
+        startBackupTask();
+
 
         getLogger().info("-------------------------------");
         getLogger().info("Moderation plugin enabled!");
         getLogger().info("-------------------------------");
-    }
-
-    private void createDir() {
-        File importsFolder = new File(getDataFolder(), "imports");
-        File exportsFolder = new File(getDataFolder(), "exports");
-        if (!importsFolder.exists()) {
-            importsFolder.mkdirs();
-            getLogger().info("Created imports folder: " + importsFolder.getAbsolutePath());
-        }
-        if (!exportsFolder.exists()) {
-            exportsFolder.mkdirs();
-            getLogger().info("Created exports folder: " + exportsFolder.getAbsolutePath());
-        }
     }
 
     @Override
@@ -111,16 +99,35 @@ public final class Moderation extends JavaPlugin {
         getLogger().info("Moderation plugin disabled!");
     }
 
-    private void startPlayerCacheTask() {
-        long check = getConfigManager().getIntervalCheck() * 20;
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            List<String> newNames = Bukkit.getOnlinePlayers().stream()
-                    .map(p -> p.getName().toLowerCase())
-                    .collect(Collectors.toList());
+    private void startBackupTask(){
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () ->{
+            String def = getConfigManager().getDefaultExtension();
+            if(!(def.equals("txt") || def.equals("json"))) {
+                def = "txt";
+                getLogger().warning("Default extension not set or set incorrectly. Now is " + def);
+            }
+            if(def.equals("txt")){
+                getImportExportManager().exportBlacklistTXT(null);
+                getImportExportManager().exportWhitelistTXT(null);
+            }else if(def.equals("json")){
+                getImportExportManager().exportBlacklistJSON(null);
+                getImportExportManager().exportWhitelistJSON(null);
+            }
+        }, 0L, getConfigManager().getBackupDelay());
+    }
+    
 
-            cachedPlayerNames.clear();
-            cachedPlayerNames.addAll(newNames);
-        }, 0L, check).getTaskId();
+    private void createDir() {
+        File importsFolder = new File(getDataFolder(), "imports");
+        File exportsFolder = new File(getDataFolder(), "exports");
+        if (!importsFolder.exists()) {
+            importsFolder.mkdirs();
+            getLogger().info("Created imports folder: " + importsFolder.getAbsolutePath());
+        }
+        if (!exportsFolder.exists()) {
+            exportsFolder.mkdirs();
+            getLogger().info("Created exports folder: " + exportsFolder.getAbsolutePath());
+        }
     }
 
     private void startCooldownCleanupTask() {

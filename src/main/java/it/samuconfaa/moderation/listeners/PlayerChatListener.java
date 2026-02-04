@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.List;
+import java.util.Set;
 
 public class PlayerChatListener implements Listener {
     private Moderation plugin;
@@ -54,7 +55,7 @@ public class PlayerChatListener implements Listener {
         if (event.isCancelled()) return;
         String message = TextNormalizer.normalize(event.getMessage());
         Player player = event.getPlayer();
-        List<String> names = plugin.getCachedPlayerNames();
+        Set<String> names = plugin.getCachedPlayerNames();
 
         int letters = countLetters(message);
         if (letters <= plugin.getConfigManager().getMinLetters()) {
@@ -98,7 +99,7 @@ public class PlayerChatListener implements Listener {
         return letters;
     }
 
-    private double capsPercentage(String message, List<String> names) {
+    private double capsPercentage(String message, Set<String> names) {
         boolean[] ignore = new boolean[message.length()];
 
         String lowerMsg = message.toLowerCase();

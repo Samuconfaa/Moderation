@@ -16,6 +16,7 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player p = event.getPlayer();
+        plugin.getCachedPlayerNames().remove(p.getName());
         plugin.getChatCooldown().remove(p.getUniqueId());
 
         if(p.hasPermission("moderation.staff")){

@@ -13,6 +13,10 @@ caps-options:
   max-caps: 50 #%
   min-letters: 2
 
+import-export:
+  backup-delay: 15 #minute
+  default-extension: "txt"  #txt | json
+
 messages:
   prefix: "&8&l[&6&lModeration&8&l] "
   noDelay: "&cYou must wait %time% seconds before sending a message again!"

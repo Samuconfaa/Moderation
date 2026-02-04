@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +34,10 @@ public class ImportExportManager {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 Set<String> blacklist = getBlacklistFromDB();
-                File file = new File(plugin.getDataFolder(), "exports/blacklist.json");
+                Timestamp now = new Timestamp(System.currentTimeMillis());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                String date = sdf.format(now);
+                File file = new File(plugin.getDataFolder(), "exports/blacklist"+date+".json");
                 file.getParentFile().mkdirs();
 
                 JsonObject json = new JsonObject();
@@ -64,7 +69,10 @@ public class ImportExportManager {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 Set<String> whitelist = getWhitelistFromDB();
-                File file = new File(plugin.getDataFolder(), "exports/whitelist.json");
+                Timestamp now = new Timestamp(System.currentTimeMillis());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                String date = sdf.format(now);
+                File file = new File(plugin.getDataFolder(), "exports/whitelist"+date+".json");
                 file.getParentFile().mkdirs();
 
                 JsonObject json = new JsonObject();
@@ -96,7 +104,10 @@ public class ImportExportManager {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 Set<String> blacklist = getBlacklistFromDB();
-                File file = new File(plugin.getDataFolder(), "exports/blacklist.txt");
+                Timestamp now = new Timestamp(System.currentTimeMillis());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                String date = sdf.format(now);
+                File file = new File(plugin.getDataFolder(), "exports/blacklist"+date+".txt");
                 file.getParentFile().mkdirs();
 
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -129,7 +140,10 @@ public class ImportExportManager {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 Set<String> whitelist = getWhitelistFromDB();
-                File file = new File(plugin.getDataFolder(), "exports/whitelist.txt");
+                Timestamp now = new Timestamp(System.currentTimeMillis());
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                String date = sdf.format(now);
+                File file = new File(plugin.getDataFolder(), "exports/whitelist-"+date+".txt");
                 file.getParentFile().mkdirs();
 
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {

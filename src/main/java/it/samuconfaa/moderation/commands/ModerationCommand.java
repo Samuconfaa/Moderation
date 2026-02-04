@@ -102,6 +102,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        // -----------------------------------------------
         if (sub.equals("import")) {
             if (!sender.hasPermission("moderation.import")) {
                 sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());

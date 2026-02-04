@@ -29,6 +29,11 @@ public class ConfigManager {
     private int maxWordCharacter;
 
     @Getter
+    private long backupDelay;
+    @Getter
+    private String defaultExtension;
+
+    @Getter
     private String prefix;
     @Getter
     private String noPermissionMessage;
@@ -105,6 +110,9 @@ public class ConfigManager {
         DbName = plugin.getConfig().getString("database.name");
         historyLimit = plugin.getConfig().getInt("database.history-default-limit");
         maxWordCharacter = plugin.getConfig().getInt("database.max-word-length");
+
+        backupDelay = plugin.getConfig().getLong("import-export.backup-delay") * 60 * 20;
+        defaultExtension = plugin.getConfig().getString("import-export.default-extension", "txt").toLowerCase();
 
         prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.prefix"));
         noPermissionMessage = getConfigString("messages.no-permission");
