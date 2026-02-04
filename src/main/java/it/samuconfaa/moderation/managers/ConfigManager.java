@@ -3,9 +3,6 @@ package it.samuconfaa.moderation.managers;
 import it.samuconfaa.moderation.Moderation;
 import lombok.Getter;
 import org.bukkit.ChatColor;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.Sound;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,17 +25,22 @@ public class ConfigManager {
     private String DbName;
     @Getter
     private int historyLimit;
+    @Getter
+    private int maxWordCharacter;
 
     @Getter
     private String prefix;
     @Getter
     private String noPermissionMessage;
     @Getter
-    private String addWordMessage;
+    private String addWordToBlacklistMessage;
     @Getter
-    private String removeWordMessage;
+    private String removeWordFromBlacklistMessage;
     @Getter
-    private String notBlacklistedMessage;
+    private String addWordToWhitelistMessage;
+    @Getter
+    private String removeWordFromWhitelistMessage;
+
     @Getter
     private String reloadMessage;
     @Getter
@@ -49,6 +51,12 @@ public class ConfigManager {
     private String noWordMessage;
     @Getter
     private String blacklistedMessage;
+    @Getter
+    private String notBlacklistedMessage;
+    @Getter
+    private String whitelistedMessage;
+    @Getter
+    private String notWhitelistedMessage;
     @Getter
     private String onlyPlayerMessage;
     @Getter
@@ -63,6 +71,12 @@ public class ConfigManager {
     private String staffSignMessage;
     @Getter
     private String onlyIntegerMessage;
+    @Getter
+    private String noEmptyWordsMessage;
+    @Getter
+    private String wordTooLongMessage;
+    @Getter
+    private String onlyLettersNumbersMessage;
 
     @Getter
     private String historyHeader;
@@ -90,17 +104,23 @@ public class ConfigManager {
 
         DbName = plugin.getConfig().getString("database.name");
         historyLimit = plugin.getConfig().getInt("database.history-default-limit");
+        maxWordCharacter = plugin.getConfig().getInt("database.max-word-length");
 
         prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.prefix"));
         noPermissionMessage = getConfigString("messages.no-permission");
-        addWordMessage = getConfigString("messages.addWord");
-        removeWordMessage = getConfigString("messages.removeWord");
-        notBlacklistedMessage = getConfigString("messages.notBlacklisted");
+        addWordToBlacklistMessage = getConfigString("messages.addWordToBlacklist");
+        removeWordFromBlacklistMessage = getConfigString("messages.removeWordFromBlacklist");
+        addWordToWhitelistMessage = getConfigString("messages.addWordToWhitelist");
+        removeWordFromWhitelistMessage = getConfigString("messages.removeWordFromWhitelist");
         reloadMessage = getConfigString("messages.reload");
         usageMessage = getConfigString("messages.usage");
         usageHistoryMessage = getConfigString("messages.usageHistory");
         noWordMessage = getConfigString("messages.noWord");
         blacklistedMessage = getConfigString("messages.blacklisted");
+        notBlacklistedMessage = getConfigString("messages.notBlacklisted");
+        whitelistedMessage = getConfigString("messages.whitelisted");
+        notWhitelistedMessage = getConfigString("messages.notWhitelisted");
+
         onlyPlayerMessage = getConfigString("messages.onlyPlayers");
         noCapsMessage = getConfigString("messages.noCaps");
         noDelayMessage = getConfigString("messages.noDelay");
@@ -108,6 +128,9 @@ public class ConfigManager {
         staffMessage = getConfigString("messages.staff-segnalation");
         staffSignMessage = getConfigString("messages.staff-sign-segnalation");
         onlyIntegerMessage = getConfigString("messages.only-integer");
+        noEmptyWordsMessage = getConfigString("messages.noEmptyWords");
+        wordTooLongMessage = getConfigString("messages.wordTooLong");
+        onlyLettersNumbersMessage = getConfigString("messages.onlyLettersNumbers");
 
         historyHeader = getConfigString("messages.player-history.header");
         historyFooter = getConfigString("messages.player-history.footer");

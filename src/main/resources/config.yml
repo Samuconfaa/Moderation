@@ -7,6 +7,7 @@ database:
 
 check-interval: 30 #seconds
 message-delay: 3 #seconds
+max-word-length: 20
 
 caps-options:
   max-caps: 50 #%
@@ -16,23 +17,30 @@ messages:
   prefix: "&8&l[&6/lModeration&8&l] "
   noDelay: "&cYou must wait %time% seconds before sending a message again!"
   no-permission: "&cYou don't have permission to do that!"
-  addWord: "&aSuccessfully added to the blacklist!"
-  removeWord: "&aSuccessfully removed from the blacklist!"
+  addWordToBlacklist: "&aSuccessfully added to the blacklist!"
+  removeWordFromBlacklist: "&aSuccessfully removed from the blacklist!"
+  addWordToWhitelist: "&aSuccessfully added to the whitelist!"
+  removeWordFromWhitelist: "&aSuccessfully removed from the whitelist!"
   notBlacklisted: "&cThis word is not blacklisted!"
   blacklisted: "&cThis word is blacklisted!"
+  notWhitelisted: "&cThis word is not blacklisted!"
+  whitelisted: "&cThis word is blacklisted!"
   reload: "&aSuccessfully reloaded the config!"
-  usage: "&cUsage: /moderation <add|remove|check> <word>"
+  usage: "&cUsage: /moderation <add|remove|check> <blacklist|whitelist> <word>"
   usageHistory: "&cUsage: /moderation history <player> {limit}"
   noWord: "&cPlease specify a word!"
   only-integer: "&cPlease specify a valid integer!"
   onlyPlayers: "&cOnly players can use this command!"
   noCaps: "&cThis message has too many caps!"
+  noEmptyWords: "&cYou can't add empty words!"
+  wordTooLong: "&cThe word is too long! Max %max% characters!"
+  onlyLettersNumbers: "&cThe word can only contain letters and numbers!"
   help:
     - "&6========== MODERATION HELP =========="
     - ""
-    - "&a/moderation add <word>  &7- Add a word to the blacklist"
-    - "&a/moderation remove <word>  &7- Remove a word from the blacklist"
-    - "&a/moderation check <word>  &7- Check if a word is blacklisted"
+    - "&a/moderation add <blacklist|whitelist> <word>  &7- Add a word to the blacklist"
+    - "&a/moderation remove <blacklist|whitelist> <word>  &7- Remove a word from the blacklist"
+    - "&a/moderation check <blacklist|whitelist> <word>  &7- Check if a word is blacklisted"
     - "&a/moderation reload  &7- Reload the config"
     - "&a/moderation history <player> {limit} &7- Check the history of a player"
     - ""

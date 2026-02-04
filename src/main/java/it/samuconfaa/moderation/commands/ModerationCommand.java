@@ -38,28 +38,48 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
         // -----------------------------------------------
         if (sub.equals("check")) {
             if (sender.hasPermission("moderation.check")) {
-                if (args.length < 2) {
-                    sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
-                    return true;
+                if (args.length != 3) {
+                    if(args.length == 2) {
+                        sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
+                        return true;
+                    }else{
+                        sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                        return true;
+                    }
+                }else{
+                    String type = args[1].toLowerCase();
+                    String word = checkWord(args[2], sender);
+                    if(word == null) return true;
+                    if(type.equals("blacklist")){
+                        boolean isBlocked = DbManager.isBlacklisted(word);
+                        if (isBlocked) {
+                            sender.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
+                            return true;
+                        }else{
+                            sender.sendMessage(plugin.getConfigManager().getNotBlacklistedMessage());
+                            return true;
+                        }
+                    }else if(type.equals("whitelist")){
+                        boolean isWhitelisted = DbManager.isWhitelisted(word);
+                        if(isWhitelisted){
+                            sender.sendMessage(plugin.getConfigManager().getWhitelistedMessage());
+                            return true;
+                        }else{
+                            sender.sendMessage(plugin.getConfigManager().getNotWhitelistedMessage());
+                            return true;
+                        }
+                    }else{
+                        sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                        return true;
+                    }
                 }
             } else {
                 sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
                 return true;
             }
-
-            String word = args[1];
-            boolean isBlocked = DbManager.isBlacklisted(word);
-            if (isBlocked) {
-                sender.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
-            } else {
-                sender.sendMessage(plugin.getConfigManager().getNotBlacklistedMessage());
-            }
-
-            return true;
         }
 
         // -----------------------------------------------
-
 
         switch (sub) {
             case "reload":
@@ -76,49 +96,66 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
                     return true;
                 }
-                if (args.length < 2) {
-                    sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
-                    return true;
+                if (args.length != 3) {
+                    if(args.length == 2) {
+                        sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
+                        return true;
+                    }else{
+                        sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                        return true;
+                    }
+                }else{
+                    String type = args[1];
+                    String addWord = checkWord(args[2], sender);
+                    if(addWord == null) return true;
+                    if(type.equals("whitelist")){
+                        DbManager.addWordToWhitelist(addWord, plugin, () ->
+                                sender.sendMessage(plugin.getConfigManager().getAddWordToWhitelistMessage())
+                        );
+                        return true;
+                    }else if(type.equals("blacklist")){
+                        DbManager.addWordToBlacklist(addWord, plugin, () ->
+                                sender.sendMessage(plugin.getConfigManager().getAddWordToBlacklistMessage())
+                        );
+                        return true;
+                    }else{
+                        sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                        return true;
+                    }
                 }
-
-                String addWord = args[1].toLowerCase().trim();
-
-                // Validazione
-                if (addWord.isEmpty()) {
-                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cWord cannot be empty!");
-                    return true;
-                }
-
-                if (addWord.length() > 50) {
-                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cWord too long (max 50 chars)!");
-                    return true;
-                }
-
-                if (!addWord.matches("[a-z0-9]+")) {
-                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cWord can only contain letters and numbers!");
-                    return true;
-                }
-
-                DbManager.addWordToBlacklist(addWord, plugin, () ->
-                        sender.sendMessage(plugin.getConfigManager().getAddWordMessage())
-                );
-                break;
 
             case "remove":
                 if (!sender.hasPermission("moderation.remove")) {
                     sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
                     return true;
                 }
-                if (args.length < 2) {
-                    sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
-                    return true;
+                if (args.length != 3) {
+                    if(args.length == 2) {
+                        sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
+                        return true;
+                    }else{
+                        sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                        return true;
+                    }
+                }else{
+                    String type = args[1];
+                    String addWord = checkWord(args[2], sender);
+                    if(addWord == null) return true;
+                    if(type.equals("whitelist")){
+                        DbManager.removeWordFromBlacklist(addWord, plugin, () ->
+                                sender.sendMessage(plugin.getConfigManager().getAddWordToWhitelistMessage())
+                        );
+                        return true;
+                    }else if(type.equals("blacklist")){
+                        DbManager.removeWordFromBlacklist(addWord, plugin, () ->
+                                sender.sendMessage(plugin.getConfigManager().getAddWordToBlacklistMessage())
+                        );
+                        return true;
+                    }else{
+                        sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                        return true;
+                    }
                 }
-
-                String removeWord = args[1];
-                DbManager.removeWordFromBlacklist(removeWord, plugin, () ->
-                        sender.sendMessage(plugin.getConfigManager().getRemoveWordMessage())
-                );
-                break;
 
             case "history":
                 if (!sender.hasPermission("moderation.history")) {
@@ -170,11 +207,32 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 break;
 
             default:
-                sender.sendMessage(plugin.getConfigManager().getUsageMessage());
+                for (String line : plugin.getConfigManager().getHelpMessage()) {
+                    sender.sendMessage(line);
+                }
                 break;
         }
 
         return true;
+    }
+
+    private String checkWord(String word, CommandSender sender) {
+        String addWord = word.toLowerCase().trim();
+        if (addWord.isEmpty()) {
+            sender.sendMessage(plugin.getConfigManager().getNoEmptyWordsMessage());
+            return null;
+        }
+
+        if (addWord.length() > 50) {
+            sender.sendMessage(plugin.getConfigManager().getWordTooLongMessage().replace("%max%", plugin.getConfigManager().getMaxWordCharacter()+""));
+            return null;
+        }
+
+        if (!addWord.matches("[a-z0-9]+")) {
+            sender.sendMessage(plugin.getConfigManager().getOnlyLettersNumbersMessage());
+            return null;
+        }
+        return addWord;
     }
 
 
