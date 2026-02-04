@@ -12,14 +12,34 @@ commands:
 
 permissions:
   moderation.admin:
-    description: "Permette di usare tutti i sottocomandi admin (add, remove, reload)"
+    description: "Permette di usare tutti i sottocomandi"
     default: op
     children:
       moderation.check: true
       moderation.staff: true
+      moderation.reload: true
+      moderation.add: true
+      moderation.remove: true
+      moderation.history: true
 
   moderation.staff:
     description: "Per ricevere le segnalazioni"
+    default: op
+
+  moderation.add:
+    description: "Permette di usare il sottocomando add"
+    default: op
+
+  moderation.reload:
+    description: "Permette di usare il sottocomando reload"
+    default: op
+
+  moderation.remove:
+    description: "Permette di usare il sottocomando remove"
+    default: op
+
+  moderation.history:
+    description: "Permette di usare il sottocomando history"
     default: op
 
   moderation.check:

@@ -117,7 +117,7 @@ public class ConfigManager {
     private void checkAndUpdateConfig() {
         int currentVersion = plugin.getConfig().getInt("config-version", 0);
 
-        if (currentVersion < CONFIG_VERSION) {
+        if (currentVersion != CONFIG_VERSION) {
             plugin.getLogger().warning("╔════════════════════════════════════════════╗");
             plugin.getLogger().warning("║  CONFIG OUTDATED - Updating...             ║");
             plugin.getLogger().warning("║  Old version: " + currentVersion + " → New version: " + CONFIG_VERSION + "       ║");

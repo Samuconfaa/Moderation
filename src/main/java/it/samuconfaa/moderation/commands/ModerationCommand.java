@@ -37,12 +37,12 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
 
         // -----------------------------------------------
         if (sub.equals("check")) {
-            if(sender.hasPermission("moderation.check")) {
+            if (sender.hasPermission("moderation.check")) {
                 if (args.length < 2) {
                     sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
                     return true;
                 }
-            }else{
+            } else {
                 sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
                 return true;
             }
@@ -60,18 +60,23 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
         }
 
         // -----------------------------------------------
-        if (!sender.hasPermission("moderation.admin")) {
-            sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
-            return true;
-        }
+
 
         switch (sub) {
             case "reload":
+                if (!sender.hasPermission("moderation.reload")) {
+                    sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+                    return true;
+                }
                 plugin.getConfigManager().load();
                 sender.sendMessage(plugin.getConfigManager().getReloadMessage());
                 break;
 
             case "add":
+                if (!sender.hasPermission("moderation.add")) {
+                    sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
                     return true;
@@ -84,6 +89,10 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 break;
 
             case "remove":
+                if (!sender.hasPermission("moderation.remove")) {
+                    sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+                    return true;
+                }
                 if (args.length < 2) {
                     sender.sendMessage(plugin.getConfigManager().getNoWordMessage());
                     return true;
@@ -96,12 +105,16 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 break;
 
             case "history":
+                if (!sender.hasPermission("moderation.history")) {
+                    sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+                    return true;
+                }
                 String playerName;
                 int limit = 0;
 
-                if(args.length == 2){
+                if (args.length == 2) {
                     playerName = args[1];
-                }else if(args.length == 3){
+                } else if (args.length == 3) {
                     playerName = args[1];
                     try {
                         limit = Integer.parseInt(args[2]);
@@ -110,7 +123,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                         return true;
                     }
 
-                }else{
+                } else {
                     playerName = "";
                     sender.sendMessage(plugin.getConfigManager().getUsageHistoryMessage());
                     return true;
@@ -154,15 +167,22 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             List<String> completions = new ArrayList<>();
 
-
             List<String> commands = List.of("reload", "add", "remove", "check", "history");
-
 
             List<String> allowed = new ArrayList<>();
             for (String cmd : commands) {
                 switch (cmd) {
-                    case "reload", "add", "remove", "history" -> {
-                        if (sender.hasPermission("moderation.admin")) allowed.add(cmd);
+                    case "reload" ->{
+                        if (sender.hasPermission("moderation.reload")) allowed.add(cmd);
+                    }
+                    case "add" ->{
+                        if (sender.hasPermission("moderation.add")) allowed.add(cmd);
+                    }
+                    case "remove" ->{
+                        if (sender.hasPermission("moderation.remove")) allowed.add(cmd);
+                    }
+                    case "history" -> {
+                        if (sender.hasPermission("moderation.history")) allowed.add(cmd);
                     }
                     case "check" -> {
                         if (sender.hasPermission("moderation.check")) allowed.add(cmd);
@@ -173,6 +193,25 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             org.bukkit.util.StringUtil.copyPartialMatches(args[0], allowed, completions);
             completions.sort(String::compareToIgnoreCase);
             return completions;
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("history")) {
+            if (sender.hasPermission("moderation.admin")) {
+                List<String> completions = new ArrayList<>();
+                List<String> playerNames = Bukkit.getOnlinePlayers().stream()
+                        .map(org.bukkit.entity.Player::getName)
+                        .toList();
+
+                org.bukkit.util.StringUtil.copyPartialMatches(args[1], playerNames, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("history")) {
+            if (sender.hasPermission("moderation.admin")) {
+                return List.of("5", "10", "20", "50", "100");
+            }
         }
 
         return List.of();
