@@ -2,6 +2,7 @@ package it.samuconfaa.moderation;
 
 import it.samuconfaa.moderation.commands.ModerationCommand;
 import it.samuconfaa.moderation.listeners.PlayerChatListener;
+import it.samuconfaa.moderation.listeners.PlayerJoinListener;
 import it.samuconfaa.moderation.listeners.PlayerQuitListener;
 import it.samuconfaa.moderation.listeners.SignChangeListener;
 import it.samuconfaa.moderation.managers.ConfigManager;
@@ -12,27 +13,27 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public final class Moderation extends JavaPlugin {
-
+    @Getter
     private static Moderation instance;
+
     @Getter
     private ConfigManager configManager;
 
     @Getter
-    private volatile List<String> cachedPlayerNames = new CopyOnWriteArrayList<>();
+    private final List<String> cachedPlayerNames = new CopyOnWriteArrayList<>();
 
     @Getter
-    private final HashMap<UUID, Long> chatCooldown = new HashMap<>();
+    private final ConcurrentHashMap<UUID, Long> chatCooldown = new ConcurrentHashMap<>();
 
     @Getter
-    private List<Player> staff = new ArrayList<>();
+    private final List<Player> staff = new CopyOnWriteArrayList<>();
 
     @Override
     public void onEnable() {
@@ -40,7 +41,6 @@ public final class Moderation extends JavaPlugin {
         saveDefaultConfig();
         configManager = new ConfigManager(this);
         configManager.load();
-
 
         String pluginName = "Moderation";
         String rawKey = getConfigManager().getLicenseKey();
@@ -55,11 +55,12 @@ public final class Moderation extends JavaPlugin {
 
         getCommand("moderation").setExecutor(new ModerationCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this); // ✅ AGGIUNTO
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
+
         DbManager.init(this);
         startPlayerCacheTask();
-
 
         getLogger().info("-------------------------------");
         getLogger().info("Moderation plugin enabled!");
@@ -72,17 +73,20 @@ public final class Moderation extends JavaPlugin {
         DbManager.close();
         chatCooldown.clear();
         staff.clear();
+        cachedPlayerNames.clear();
 
         getLogger().info("Moderation plugin disabled!");
-
     }
 
     private void startPlayerCacheTask() {
-        long check = getConfigManager().getIntervalCheck() *20;
+        long check = getConfigManager().getIntervalCheck() * 20;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            cachedPlayerNames = Bukkit.getOnlinePlayers().stream()
+            List<String> newNames = Bukkit.getOnlinePlayers().stream()
                     .map(p -> p.getName().toLowerCase())
                     .collect(Collectors.toList());
+
+            cachedPlayerNames.clear();
+            cachedPlayerNames.addAll(newNames);
         }, 0L, check);
     }
 
