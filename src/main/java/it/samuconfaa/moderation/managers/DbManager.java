@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.models.DbSegnalationModel;
 import it.samuconfaa.moderation.models.EnumAction;
+import it.samuconfaa.moderation.utils.TextNormalizer;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -191,45 +192,17 @@ public class DbManager {
     }
 
     public static String containsBlacklistedWord(String message) {
-        String normalized = message.toLowerCase();
-        String[] words = normalized.split("\\s+");
+        String normalized = TextNormalizer.normalize(message);
 
-        for (String word : words) {
-            if (WHITELIST.contains(word)) {
-                continue;
-            }
-
-            if (BLACKLIST.contains(word)) {
-                return word;
-            }
-
-            for (String blacklisted : BLACKLIST) {
-                if (word.contains(blacklisted)) {
-                    boolean isPartOfWhitelisted = false;
-                    for (String whitelisted : WHITELIST) {
-                        if (word.contains(whitelisted) && whitelisted.contains(blacklisted)) {
-                            isPartOfWhitelisted = true;
-                            break;
-                        }
-                    }
-                    if (!isPartOfWhitelisted) {
-                        return blacklisted;
-                    }
-                }
-            }
-        }
-
-        String noSpaces = normalized.replaceAll("\\s+", "");
-
-        if (WHITELIST.contains(noSpaces)) {
+        if (WHITELIST.contains(normalized)) {
             return null;
         }
 
         for (String blacklisted : BLACKLIST) {
-            if (noSpaces.contains(blacklisted)) {
+            if (normalized.contains(blacklisted)) {
                 boolean isPartOfWhitelisted = false;
                 for (String whitelisted : WHITELIST) {
-                    if (noSpaces.contains(whitelisted) && whitelisted.contains(blacklisted)) {
+                    if (normalized.contains(whitelisted) && whitelisted.contains(blacklisted)) {
                         isPartOfWhitelisted = true;
                         break;
                     }
