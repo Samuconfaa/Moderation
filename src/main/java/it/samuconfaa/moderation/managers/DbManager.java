@@ -33,7 +33,7 @@ public class DbManager {
         config.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
         config.setDriverClassName("org.sqlite.JDBC");
 
-        config.setMaximumPoolSize(1);
+        config.setMaximumPoolSize(3);
         config.setConnectionTestQuery("SELECT 1");
         config.setPoolName("ModerationPool");
 
@@ -163,12 +163,11 @@ public class DbManager {
     public static String containsBlacklistedWordCached(String message, Moderation plugin) {
         String msg = message.toLowerCase();
 
-        String foundWord = BLACKLIST.stream()
-                .filter(msg::contains)
-                .findFirst()
-                .orElse(null);
+        for (String word : BLACKLIST) {
+            if (msg.contains(word)) return word;
+        }
+        return null;
 
-        return foundWord;
     }
 
     /*

@@ -20,6 +20,9 @@ public class ConfigManager {
 
     //--------------------------------------------------------------------------------------------
     @Getter
+    private String licenseKey;
+
+    @Getter
     private String DbName;
     @Getter
     private int historyLimit;
@@ -80,6 +83,8 @@ public class ConfigManager {
     public void load() {
         checkAndUpdateConfig();
         plugin.reloadConfig();
+
+        licenseKey = plugin.getConfig().getString("license-key");
 
         DbName = plugin.getConfig().getString("database.name");
         historyLimit = plugin.getConfig().getInt("database.history-default-limit");

@@ -48,14 +48,20 @@ public class PlayerChatListener implements Listener {
     }
 
     private String serializeText(String line) {
-        return line.toLowerCase()
-                .replace("4", "a")
-                .replace("3", "e")
-                .replace("1", "i")
-                .replace("0", "o")
-                .replace("5", "s")
-                .replace("7", "t")
-                .replace("@", "a");
+        StringBuilder sb = new StringBuilder(line.toLowerCase());
+        for (int i = 0; i < sb.length(); i++) {
+            char c = sb.charAt(i);
+            switch (c) {
+                case '4' -> sb.setCharAt(i, 'a');
+                case '3' -> sb.setCharAt(i, 'e');
+                case '1' -> sb.setCharAt(i, 'i');
+                case '0' -> sb.setCharAt(i, 'o');
+                case '5' -> sb.setCharAt(i, 's');
+                case '7' -> sb.setCharAt(i, 't');
+                case '@' -> sb.setCharAt(i, 'a');
+            }
+        }
+        return sb.toString();
     }
 
     private void capsFilter(AsyncPlayerChatEvent event){

@@ -1,4 +1,5 @@
 config-version: 1 #don't modify!!!
+license-key: "MH5ZfFJyu45Y2oOY58K4e1UQScdHMGWZqo7BBAO5"
 
 database:
   name: "database.db"
