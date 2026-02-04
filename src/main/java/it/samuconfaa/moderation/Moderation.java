@@ -1,5 +1,7 @@
 package it.samuconfaa.moderation;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Cache;
 import it.samuconfaa.moderation.commands.ModerationCommand;
 import it.samuconfaa.moderation.listeners.PlayerChatListener;
 import it.samuconfaa.moderation.listeners.PlayerJoinListener;
@@ -19,6 +21,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 
 public final class Moderation extends JavaPlugin {
@@ -35,7 +38,10 @@ public final class Moderation extends JavaPlugin {
     private final Set<String> cachedPlayerNames = ConcurrentHashMap.newKeySet();
 
     @Getter
-    private final ConcurrentHashMap<UUID, Long> chatCooldown = new ConcurrentHashMap<>();
+    private final Cache<UUID, Long> chatCooldown = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
 
     @Getter
     private final Set<Player> staff = ConcurrentHashMap.newKeySet();
@@ -88,7 +94,7 @@ public final class Moderation extends JavaPlugin {
         Bukkit.getScheduler().cancelTasks(this);
 
         DbManager.close();
-        chatCooldown.clear();
+        chatCooldown.cleanUp();
         staff.clear();
         cachedPlayerNames.clear();
 
@@ -127,14 +133,9 @@ public final class Moderation extends JavaPlugin {
 
     private void startCooldownCleanupTask() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            long now = System.currentTimeMillis();
-            long maxAge = 60000 * 10;
+            chatCooldown.cleanUp();
 
-            chatCooldown.entrySet().removeIf(entry ->
-                    now - entry.getValue() > maxAge
-            );
-
-            getLogger().info("Cleaned up cooldown map. Size: " + chatCooldown.size());
+            getLogger().info("Current cooldown cache size: " + chatCooldown.estimatedSize());
         }, 6000L, 6000L);
     }
 
