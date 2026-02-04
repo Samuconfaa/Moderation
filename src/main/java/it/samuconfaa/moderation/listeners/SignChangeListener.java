@@ -34,7 +34,7 @@ public class SignChangeListener implements Listener {
             fullText.append(line).append(" ");
         }
         String text = TextNormalizer.normalize(fullText.toString());
-        String found = DbManager.containsBlacklistedWordCached(text, plugin);
+        String found = DbManager.containsBlacklistedWord(text);
         if (found != null) {
             event.setCancelled(true);
             player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());

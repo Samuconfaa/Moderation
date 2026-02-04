@@ -48,13 +48,12 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             }
 
             String word = args[1];
-            DbManager.isBlacklisted(word, plugin, isBlocked -> {
-                if (isBlocked) {
-                    sender.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
-                } else {
-                    sender.sendMessage(plugin.getConfigManager().getNotBlacklistedMessage());
-                }
-            });
+            boolean isBlocked = DbManager.isBlacklisted(word);
+            if (isBlocked) {
+                sender.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
+            } else {
+                sender.sendMessage(plugin.getConfigManager().getNotBlacklistedMessage());
+            }
 
             return true;
         }
@@ -100,7 +99,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                DbManager.addWord(addWord, plugin, () ->
+                DbManager.addWordToBlacklist(addWord, plugin, () ->
                         sender.sendMessage(plugin.getConfigManager().getAddWordMessage())
                 );
                 break;
@@ -116,7 +115,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 }
 
                 String removeWord = args[1];
-                DbManager.removeWord(removeWord, plugin, () ->
+                DbManager.removeWordFromBlacklist(removeWord, plugin, () ->
                         sender.sendMessage(plugin.getConfigManager().getRemoveWordMessage())
                 );
                 break;

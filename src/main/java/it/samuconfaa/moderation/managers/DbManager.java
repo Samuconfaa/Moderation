@@ -21,7 +21,9 @@ public class DbManager {
     private static Moderation pluginInstance;
     private static HikariDataSource dataSource;
     private static final Set<String> BLACKLIST = ConcurrentHashMap.newKeySet();
+    private static final Set<String> WHITELIST = ConcurrentHashMap.newKeySet();
 
+    //========= METODI DB INIZIALI ============
 
     public static void init(Moderation plugin) {
         pluginInstance = plugin;
@@ -68,6 +70,12 @@ public class DbManager {
                 );
             """;
 
+            String sqlWhitelist = """
+                CREATE TABLE IF NOT EXISTS whitelist_words (
+                    word TEXT PRIMARY KEY
+                );
+            """;
+
             String sqlHistory = """
                 CREATE TABLE IF NOT EXISTS history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,8 +91,11 @@ public class DbManager {
 
                 stmt.execute(sqlWords);
                 stmt.execute(sqlHistory);
+                stmt.execute(sqlWhitelist);
+
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                     loadBlacklist(plugin);
+                    loadWhitelist(plugin);
                 });
 
             } catch (Exception e) {
@@ -93,52 +104,19 @@ public class DbManager {
         });
     }
 
-    public static void isBlacklisted(String word, Moderation plugin, Consumer<Boolean> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            boolean found = false;
-            String sql = "SELECT 1 FROM blacklist_words WHERE word = ? LIMIT 1";
+    private static void loadWhitelist(Moderation plugin) {
+        String sql = "SELECT word FROM whitelist_words";
+        try (var conn = getConnection();
+             var stmt = conn.createStatement();
+             var rs = stmt.executeQuery(sql)) {
 
-            try (var conn = DbManager.getConnection();
-                 var ps = conn.prepareStatement(sql)) {
-
-                ps.setString(1, word.toLowerCase());
-                var rs = ps.executeQuery();
-                found = rs.next();
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            WHITELIST.clear();
+            while (rs.next()) {
+                WHITELIST.add(rs.getString("word"));
             }
-
-            boolean finalFound = found;
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(finalFound));
-        });
-    }
-
-    /*
-        DbManager.isBlacklisted("cazzo", plugin, isBlocked -> {
-            if (isBlocked) {
-                //parola vietata
-            }
-        });
-     */
-
-    public static void loadBlacklistAsync(Moderation plugin) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            String sql = "SELECT word FROM blacklist_words";
-
-            try (var conn = DbManager.getConnection();
-                 var stmt = conn.createStatement();
-                 var rs = stmt.executeQuery(sql)) {
-
-                BLACKLIST.clear();
-                while (rs.next()) {
-                    BLACKLIST.add(rs.getString("word"));
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void loadBlacklist(Moderation plugin) {
@@ -156,37 +134,81 @@ public class DbManager {
         }
     }
 
-    public static void containsBlacklistedWordCachedAsync(String message, Moderation plugin, Consumer<String> callback) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            String msg = message.toLowerCase();
-            String foundWord = BLACKLIST.stream()
-                    .filter(msg::contains)
-                    .findFirst()
-                    .orElse(null);
+    //========= METODI DB WHITELIST ============
 
-            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(foundWord));
+    public static boolean isWhitelisted(String word) {
+        return WHITELIST.contains(word);
+    }
+
+    public static void addWordToWhitelist(String word, Moderation plugin, Runnable callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String sql = "INSERT OR IGNORE INTO whitelist_words (word) VALUES (?)";
+
+            try (var conn = DbManager.getConnection();
+                 var ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, word.toLowerCase());
+                ps.executeUpdate();
+
+                WHITELIST.add(word.toLowerCase());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (callback != null) {
+                Bukkit.getScheduler().runTask(plugin, callback);
+            }
         });
     }
 
-    public static String containsBlacklistedWordCached(String message, Moderation plugin) {
+    public static void removeWordFromWhitelist(String word, Moderation plugin, Runnable callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            String sql = "DELETE FROM whitelist_words WHERE word = ?";
+
+            try (var conn = DbManager.getConnection();
+                 var ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, word.toLowerCase());
+                ps.executeUpdate();
+
+                WHITELIST.remove(word.toLowerCase());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (callback != null) {
+                Bukkit.getScheduler().runTask(plugin, callback);
+            }
+        });
+    }
+
+    public static String containsWhitelistedWord(String message, Moderation plugin) {
         String msg = message.toLowerCase();
 
         for (String word : BLACKLIST) {
             if (msg.contains(word)) return word;
         }
         return null;
-
     }
 
-    /*
-        DbManager.containsBlacklistedWordCached(message, plugin, found -> {
-            if (found) {
-                //Se ha trovato
-            }
-        });
-     */
+    //========= METODI DB BLACKLIST ============
 
-    public static void addWord(String word, Moderation plugin, Runnable callback) {
+    public static boolean isBlacklisted(String word) {
+        return BLACKLIST.contains(word);
+    }
+
+    public static String containsBlacklistedWord(String message) {
+        String msg = message.toLowerCase();
+
+        for (String word : BLACKLIST) {
+            if (msg.contains(word)) return word;
+        }
+        return null;
+    }
+
+    public static void addWordToBlacklist(String word, Moderation plugin, Runnable callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String sql = "INSERT OR IGNORE INTO blacklist_words (word) VALUES (?)";
 
@@ -208,7 +230,7 @@ public class DbManager {
         });
     }
 
-    public static void removeWord(String word, Moderation plugin, Runnable callback) {
+    public static void removeWordFromBlacklist(String word, Moderation plugin, Runnable callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             String sql = "DELETE FROM blacklist_words WHERE word = ?";
 

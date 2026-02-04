@@ -65,7 +65,7 @@ public class PlayerChatListener implements Listener {
             return;
         }
 
-        String found = DbManager.containsBlacklistedWordCached(message, plugin);
+        String found = DbManager.containsBlacklistedWord(message);
         if (found != null) {
             event.setCancelled(true);
             player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
