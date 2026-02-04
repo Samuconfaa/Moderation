@@ -82,7 +82,24 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                String addWord = args[1];
+                String addWord = args[1].toLowerCase().trim();
+
+                // Validazione
+                if (addWord.isEmpty()) {
+                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cWord cannot be empty!");
+                    return true;
+                }
+
+                if (addWord.length() > 50) {
+                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cWord too long (max 50 chars)!");
+                    return true;
+                }
+
+                if (!addWord.matches("[a-z0-9]+")) {
+                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cWord can only contain letters and numbers!");
+                    return true;
+                }
+
                 DbManager.addWord(addWord, plugin, () ->
                         sender.sendMessage(plugin.getConfigManager().getAddWordMessage())
                 );

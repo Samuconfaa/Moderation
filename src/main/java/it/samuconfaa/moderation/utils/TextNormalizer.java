@@ -54,7 +54,7 @@ public class TextNormalizer {
 
         normalized = normalized.replaceAll("\\s", "");
 
-        normalized = normalized.replaceAll("(.)\\1+", "$1");
+        normalized = normalized.replaceAll("(.)\\1{2,}", "$1$1");
 
         return normalized;
     }

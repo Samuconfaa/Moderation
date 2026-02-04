@@ -18,13 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class DbManager {
-
+    private static Moderation pluginInstance;
     private static HikariDataSource dataSource;
     private static final Set<String> BLACKLIST = ConcurrentHashMap.newKeySet();
 
 
     public static void init(Moderation plugin) {
-        File dataFolder = plugin.getDataFolder();
+        pluginInstance = plugin;
+        File dataFolder = pluginInstance.getDataFolder();
         if (!dataFolder.exists()) dataFolder.mkdirs();
 
         File dbFile = new File(dataFolder, plugin.getConfigManager().getDbName());
@@ -48,7 +49,14 @@ public class DbManager {
 
     public static void close() {
         if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
+            try {
+                dataSource.setMaximumPoolSize(0);
+                Thread.sleep(1000);
+                dataSource.close();
+                pluginInstance.getLogger().info("Database connection closed successfully");
+            } catch (Exception e) {
+                pluginInstance.getLogger().severe("Error closing database: " + e.getMessage());
+            }
         }
     }
 

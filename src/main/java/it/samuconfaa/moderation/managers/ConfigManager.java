@@ -7,7 +7,9 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.Sound;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigManager {
 
@@ -129,6 +131,7 @@ public class ConfigManager {
             plugin.getLogger().warning("╚════════════════════════════════════════════╝");
 
             backupConfig();
+            migrateConfig(currentVersion);
 
             plugin.getConfig().getKeys(false).forEach(key ->
                     plugin.getConfig().set(key, null)
@@ -157,6 +160,38 @@ public class ConfigManager {
         } catch (Exception e) {
             plugin.getLogger().severe("Failed to backup config: " + e.getMessage());
         }
+    }
+
+    private void migrateConfig(int fromVersion) {
+        Map<String, Object> userValues = new HashMap<>();
+
+        List<String> preserveKeys = List.of(
+                "license-key",
+                "database.name",
+                "database.history-default-limit",
+                "check-interval",
+                "message-delay",
+                "caps-options.max-caps",
+                "caps-options.min-letters"
+        );
+
+        for (String key : preserveKeys) {
+            if (plugin.getConfig().contains(key)) {
+                userValues.put(key, plugin.getConfig().get(key));
+            }
+        }
+
+        plugin.saveDefaultConfig();
+        plugin.reloadConfig();
+
+        for (Map.Entry<String, Object> entry : userValues.entrySet()) {
+            plugin.getConfig().set(entry.getKey(), entry.getValue());
+        }
+
+        plugin.getConfig().set("config-version", CONFIG_VERSION);
+        plugin.saveConfig();
+
+        plugin.getLogger().info("Preserved " + userValues.size() + " user settings");
     }
 
     //--------------------------------------------------------------------------------------------

@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -27,13 +28,16 @@ public final class Moderation extends JavaPlugin {
     private ConfigManager configManager;
 
     @Getter
+    private int playerCacheTaskId = -1;
+
+    @Getter
     private final List<String> cachedPlayerNames = new CopyOnWriteArrayList<>();
 
     @Getter
     private final ConcurrentHashMap<UUID, Long> chatCooldown = new ConcurrentHashMap<>();
 
     @Getter
-    private final List<Player> staff = new CopyOnWriteArrayList<>();
+    private final Set<Player> staff = ConcurrentHashMap.newKeySet();
 
     @Override
     public void onEnable() {
@@ -61,6 +65,7 @@ public final class Moderation extends JavaPlugin {
 
         DbManager.init(this);
         startPlayerCacheTask();
+        startCooldownCleanupTask();
 
         getLogger().info("-------------------------------");
         getLogger().info("Moderation plugin enabled!");
@@ -70,6 +75,8 @@ public final class Moderation extends JavaPlugin {
     @Override
     public void onDisable() {
         instance = null;
+        Bukkit.getScheduler().cancelTasks(this);
+
         DbManager.close();
         chatCooldown.clear();
         staff.clear();
@@ -87,7 +94,20 @@ public final class Moderation extends JavaPlugin {
 
             cachedPlayerNames.clear();
             cachedPlayerNames.addAll(newNames);
-        }, 0L, check);
+        }, 0L, check).getTaskId();
+    }
+
+    private void startCooldownCleanupTask() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            long now = System.currentTimeMillis();
+            long maxAge = 60000 * 10;
+
+            chatCooldown.entrySet().removeIf(entry ->
+                    now - entry.getValue() > maxAge
+            );
+
+            getLogger().info("Cleaned up cooldown map. Size: " + chatCooldown.size());
+        }, 6000L, 6000L);
     }
 
 }
