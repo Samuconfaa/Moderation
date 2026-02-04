@@ -9,6 +9,7 @@ import it.samuconfaa.moderation.managers.ConfigManager;
 import it.samuconfaa.moderation.managers.DbManager;
 import it.samuconfaa.moderation.managers.LicenseManager;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,6 +40,10 @@ public final class Moderation extends JavaPlugin {
     @Getter
     private final Set<Player> staff = ConcurrentHashMap.newKeySet();
 
+    @Getter
+    @Setter
+    public boolean update = false;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -59,7 +64,7 @@ public final class Moderation extends JavaPlugin {
 
         getCommand("moderation").setExecutor(new ModerationCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this); // ✅ AGGIUNTO
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 

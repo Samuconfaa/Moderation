@@ -2,6 +2,7 @@ package it.samuconfaa.moderation.managers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import it.samuconfaa.moderation.Moderation;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,10 +16,9 @@ public class LicenseManager {
     private final String pluginName;
     private final String licenseKey;
     private final String apiUrl = "https://samuconfa.it/attivazioni/check";
-    private final JavaPlugin plugin;
-    public static boolean update = false;
+    private final Moderation plugin;
 
-    public LicenseManager(JavaPlugin plugin, String pluginName, String licenseKey) {
+    public LicenseManager(Moderation plugin, String pluginName, String licenseKey) {
         this.plugin = plugin;
         this.pluginName = pluginName;
         this.licenseKey = licenseKey;
@@ -53,7 +53,7 @@ public class LicenseManager {
                             String currentVersion = plugin.getDescription().getVersion();
 
                             if (!latestVersion.equalsIgnoreCase(currentVersion)) {
-                                update = true;
+                                plugin.setUpdate(true);
                                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                                     Bukkit.getConsoleSender().sendMessage("");
                                     Bukkit.getConsoleSender().sendMessage("§8§m----------------------------------");
