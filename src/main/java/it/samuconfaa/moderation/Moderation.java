@@ -42,12 +42,11 @@ public final class Moderation extends JavaPlugin {
         String pluginName = "Moderation";
         String rawKey = getConfigManager().getLicenseKey();
         if (rawKey == null || rawKey.isEmpty()) {
-            getLogger().severe("Inserisci una licenza nel config.yml!");
+            getLogger().severe("config.yml doesn't have a license!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
         String key = rawKey.trim();
-        getLogger().info("Debug Licenza: [" + key + "] Lunghezza: " + key.length());
 
         new LicenseManager(this, pluginName, key).check();
 
