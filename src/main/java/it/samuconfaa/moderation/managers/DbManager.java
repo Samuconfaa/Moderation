@@ -200,11 +200,42 @@ public class DbManager {
     }
 
     public static String containsBlacklistedWord(String message) {
-        String msg = message.toLowerCase();
+        String normalized = message.toLowerCase();
 
-        for (String word : BLACKLIST) {
-            if (msg.contains(word)) return word;
+        String[] words = normalized.split("\\s+");
+
+        for (String word : words) {
+            if (WHITELIST.contains(word)) {
+                continue;
+            }
+
+            if (BLACKLIST.contains(word)) {
+                return word;
+            }
+
+            for (String blacklisted : BLACKLIST) {
+                if (word.contains(blacklisted)) {
+                    return blacklisted;
+                }
+            }
         }
+
+        String noSpaces = normalized.replaceAll("\\s+", "");
+        for (String blacklisted : BLACKLIST) {
+            if (noSpaces.contains(blacklisted)) {
+                boolean isPartOfWhitelisted = false;
+                for (String whitelisted : WHITELIST) {
+                    if (noSpaces.contains(whitelisted) && whitelisted.contains(blacklisted)) {
+                        isPartOfWhitelisted = true;
+                        break;
+                    }
+                }
+                if (!isPartOfWhitelisted) {
+                    return blacklisted;
+                }
+            }
+        }
+
         return null;
     }
 
