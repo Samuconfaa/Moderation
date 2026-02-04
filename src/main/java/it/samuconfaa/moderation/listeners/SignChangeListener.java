@@ -2,6 +2,7 @@ package it.samuconfaa.moderation.listeners;
 
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
+import it.samuconfaa.moderation.models.DbSegnalationModel;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -37,7 +38,7 @@ public class SignChangeListener implements Listener {
         if (found != null) {
             event.setCancelled(true);
             player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
-
+            DbManager.addHistory(plugin, player.getUniqueId().toString(), text, DbSegnalationModel.Action.SIGN_MESSAGE);
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 sendStaffMessage(found, player, loc);
             });

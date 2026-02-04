@@ -21,6 +21,8 @@ public class ConfigManager {
     //--------------------------------------------------------------------------------------------
     @Getter
     private String DbName;
+    @Getter
+    private int historyLimit;
 
     @Getter
     private String prefix;
@@ -37,6 +39,8 @@ public class ConfigManager {
     @Getter
     private String usageMessage;
     @Getter
+    private String usageHistoryMessage;
+    @Getter
     private String noWordMessage;
     @Getter
     private String blacklistedMessage;
@@ -52,6 +56,15 @@ public class ConfigManager {
     private String staffMessage;
     @Getter
     private String staffSignMessage;
+    @Getter
+    private String onlyIntegerMessage;
+
+    @Getter
+    private String historyHeader;
+    @Getter
+    private String historyFooter;
+    @Getter
+    private List<String> historyBody;
 
     @Getter
     private int maxCaps;
@@ -69,6 +82,7 @@ public class ConfigManager {
         plugin.reloadConfig();
 
         DbName = plugin.getConfig().getString("database.name");
+        historyLimit = plugin.getConfig().getInt("database.history-default-limit");
 
         prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.prefix"));
         noPermissionMessage = getConfigString("messages.no-permission");
@@ -77,6 +91,7 @@ public class ConfigManager {
         notBlacklistedMessage = getConfigString("messages.notBlacklisted");
         reloadMessage = getConfigString("messages.reload");
         usageMessage = getConfigString("messages.usage");
+        usageHistoryMessage = getConfigString("messages.usageHistory");
         noWordMessage = getConfigString("messages.noWord");
         blacklistedMessage = getConfigString("messages.blacklisted");
         onlyPlayerMessage = getConfigString("messages.onlyPlayers");
@@ -85,6 +100,11 @@ public class ConfigManager {
         helpMessage = colorList(plugin.getConfig().getStringList("messages.help"));
         staffMessage = getConfigString("messages.staff-segnalation");
         staffSignMessage = getConfigString("messages.staff-sign-segnalation");
+        onlyIntegerMessage = getConfigString("messages.only-integer");
+
+        historyHeader = getConfigString("messages.player-history.header");
+        historyFooter = getConfigString("messages.player-history.footer");
+        historyBody = colorList(plugin.getConfig().getStringList("messages.player-history.body"));
 
         maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
         minLetters = plugin.getConfig().getInt("caps-options.min-letters");

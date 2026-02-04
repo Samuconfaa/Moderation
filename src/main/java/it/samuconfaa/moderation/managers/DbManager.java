@@ -3,12 +3,16 @@ package it.samuconfaa.moderation.managers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.samuconfaa.moderation.Moderation;
+import it.samuconfaa.moderation.models.DbSegnalationModel;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -49,16 +53,27 @@ public class DbManager {
 
     private static void createTables(Moderation plugin) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            String sql = """
+            String sqlWords = """
                 CREATE TABLE IF NOT EXISTS blacklist_words (
                     word TEXT PRIMARY KEY
+                );
+            """;
+
+            String sqlHistory = """
+                CREATE TABLE IF NOT EXISTS history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    playerUUID TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    data_ora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    action TEXT NOT NULL
                 );
             """;
 
             try (var conn = getConnection();
                  var stmt = conn.createStatement()) {
 
-                stmt.execute(sql);
+                stmt.execute(sqlWords);
+                stmt.execute(sqlHistory);
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                     loadBlacklist(plugin);
                 });
@@ -217,6 +232,79 @@ public class DbManager {
         });
      */
 
+    //===============METODI HISTORY==========================
+    public static void addHistory(Moderation plugin, String playerUUID, String message, DbSegnalationModel.Action action) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->{
+            String sql = """
+                INSERT INTO history (playerUUID, message, action)
+                VALUES (?, ?, ?)
+            """;
 
+            try (var conn = DbManager.getConnection();
+                 var ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, playerUUID);
+                ps.setString(2, message);
+                ps.setString(3, action.name());
+                ps.executeUpdate();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void getHistory(Moderation plugin, String playerUUID, int limit, Consumer<List<DbSegnalationModel>> callback) {
+        if(limit == 0){
+            limit = plugin.getConfigManager().getHistoryLimit();
+        }
+        int finalLimit = limit;
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, ()->{
+            List<DbSegnalationModel> history = new ArrayList<>();
+
+            String sql = """
+                SELECT id, playerUUID, message, data_ora, action
+                FROM history
+                WHERE playerUUID = ?
+                ORDER BY data_ora DESC
+                LIMIT ?
+            """;
+            try (var conn = DbManager.getConnection();
+                 var ps = conn.prepareStatement(sql)) {
+
+                ps.setString(1, playerUUID);
+                ps.setInt(2, finalLimit);
+
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+
+                        DbSegnalationModel.Action action;
+                        try {
+                            action = DbSegnalationModel.Action.valueOf(
+                                    rs.getString("action")
+                            );
+                        } catch (Exception e) {
+                            action = DbSegnalationModel.Action.PLUGIN_ERROR;
+                        }
+
+                        DbSegnalationModel model = new DbSegnalationModel(
+                                rs.getInt("id"),
+                                UUID.fromString(rs.getString("playerUUID")),
+                                rs.getString("message"),
+                                rs.getTimestamp("data_ora"),
+                                action
+                        );
+
+                        history.add(model);
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(history));
+        });
+    }
 
 }

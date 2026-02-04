@@ -2,6 +2,7 @@ package it.samuconfaa.moderation.commands;
 
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
+import it.samuconfaa.moderation.models.DbSegnalationModel;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -92,6 +93,40 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 );
                 break;
 
+            case "history":
+                String playerName;
+                int limit = 0;
+
+                if(args.length == 2){
+                    playerName = args[1];
+                }else if(args.length == 3){
+                    playerName = args[1];
+                    try {
+                        limit = Integer.parseInt(args[2]);
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(plugin.getConfigManager().getOnlyIntegerMessage());
+                        return true;
+                    }
+
+                }else{
+                    playerName = "";
+                    sender.sendMessage(plugin.getConfigManager().getUsageHistoryMessage());
+                    return true;
+                }
+
+                DbManager.getHistory(plugin, playerName, limit, history -> {
+                    sender.sendMessage(plugin.getConfigManager().getHistoryHeader());
+                    for(DbSegnalationModel model : history){
+                        for(String line : plugin.getConfigManager().getHistoryBody()){
+                            sender.sendMessage(line
+                                    .replace("%player%", playerName)
+                                    .replace("%message%", model.Message)
+                                    .replace("%action%", model.Action.toString()));
+                        }
+                    }
+                    sender.sendMessage(plugin.getConfigManager().getHistoryFooter());
+                });
+
             default:
                 sender.sendMessage(plugin.getConfigManager().getUsageMessage());
                 break;
@@ -107,13 +142,13 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             List<String> completions = new ArrayList<>();
 
 
-            List<String> commands = List.of("reload", "add", "remove", "check");
+            List<String> commands = List.of("reload", "add", "remove", "check", "history");
 
 
             List<String> allowed = new ArrayList<>();
             for (String cmd : commands) {
                 switch (cmd) {
-                    case "reload", "add", "remove" -> {
+                    case "reload", "add", "remove", "history" -> {
                         if (sender.hasPermission("moderation.admin")) allowed.add(cmd);
                     }
                     case "check" -> {

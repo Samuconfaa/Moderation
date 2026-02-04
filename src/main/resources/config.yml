@@ -1,7 +1,8 @@
-config-version: 2 #don't modify!!!
+config-version: 1 #don't modify!!!
 
 database:
   name: "database.db"
+  history-default-limit: 20
 
 check-interval: 30 #seconds
 message-delay: 3 #seconds
@@ -20,7 +21,9 @@ messages:
   blacklisted: "&cThis word is blacklisted!"
   reload: "&aSuccessfully reloaded the config!"
   usage: "&cUsage: /moderation <add|remove|check> <word>"
+  usageHistory: "&cUsage: /moderation history <player> {limit}"
   noWord: "&cPlease specify a word!"
+  only-integer: "&cPlease specify a valid integer!"
   onlyPlayers: "&cOnly players can use this command!"
   noCaps: "&cThis message has too many caps!"
   help:
@@ -30,8 +33,18 @@ messages:
     - "&a/moderation remove <word>  &7- Remove a word from the blacklist"
     - "&a/moderation check <word>  &7- Check if a word is blacklisted"
     - "&a/moderation reload  &7- Reload the config"
+    - "&a/moderation history <player> {limit} &7- Check the history of a player"
     - ""
     - "&6====================================="
+  player-history:
+    header: "&6========== %player% HISTORY =========="
+    body:
+      - ""
+      - "&aDate: &7%date%"
+      - "&aMessage: &7%message%"
+      - "&aAction: &7%action%"
+      - ""
+    footer: "&6====================================="
   staff-segnalation: "&c%player% has sent a message with %word%"
   staff-sign-segnalation: "&c%player% has place a sign with '%word%' in %location%"
 

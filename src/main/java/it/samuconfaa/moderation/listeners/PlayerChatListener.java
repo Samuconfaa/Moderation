@@ -2,6 +2,7 @@ package it.samuconfaa.moderation.listeners;
 
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
+import it.samuconfaa.moderation.models.DbSegnalationModel;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -71,6 +72,7 @@ public class PlayerChatListener implements Listener {
         if (caps > plugin.getConfigManager().getMaxCaps()) {
             event.setCancelled(true);
             player.sendMessage(plugin.getConfigManager().getNoCapsMessage());
+            DbManager.addHistory(plugin, player.getUniqueId().toString(), message, DbSegnalationModel.Action.CHAT_MESSAGE_CAPS);
             return;
         }
 
@@ -79,6 +81,7 @@ public class PlayerChatListener implements Listener {
             event.setCancelled(true);
             player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
             sendStaffMessage(found, player);
+            DbManager.addHistory(plugin, player.getUniqueId().toString(), message, DbSegnalationModel.Action.CHAT_MESSAGE_BLACKLIST);
         }
 
     }
