@@ -3,6 +3,8 @@ package it.samuconfaa.moderation.commands;
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
 import it.samuconfaa.moderation.models.DbSegnalationModel;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -114,18 +116,29 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                DbManager.getHistory(plugin, playerName, limit, history -> {
-                    sender.sendMessage(plugin.getConfigManager().getHistoryHeader());
-                    for(DbSegnalationModel model : history){
-                        for(String line : plugin.getConfigManager().getHistoryBody()){
-                            sender.sendMessage(line
-                                    .replace("%player%", playerName)
-                                    .replace("%message%", model.Message)
-                                    .replace("%action%", model.Action.toString()));
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+                String playerUUID = offlinePlayer.getUniqueId().toString();
+
+                int finalLimit = limit;
+                DbManager.getHistory(plugin, playerUUID, finalLimit, history -> {
+                    sender.sendMessage(plugin.getConfigManager().getHistoryHeader().replace("%player%", playerName));
+
+                    if (history.isEmpty()) {
+                        sender.sendMessage(plugin.getConfigManager().getPrefix() + "§7No history found for this player.");
+                    } else {
+                        for (DbSegnalationModel model : history) {
+                            for (String line : plugin.getConfigManager().getHistoryBody()) {
+                                sender.sendMessage(line
+                                        .replace("%player%", playerName)
+                                        .replace("%message%", model.Message)
+                                        .replace("%date%", model.Timestamp.toString())
+                                        .replace("%action%", model.Action.toString()));
+                            }
                         }
                     }
                     sender.sendMessage(plugin.getConfigManager().getHistoryFooter());
                 });
+                break;
 
             default:
                 sender.sendMessage(plugin.getConfigManager().getUsageMessage());
