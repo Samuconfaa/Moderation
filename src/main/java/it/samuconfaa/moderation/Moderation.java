@@ -31,6 +31,9 @@ public final class Moderation extends JavaPlugin {
     @Getter
     private final HashMap<UUID, Long> chatCooldown = new HashMap<>();
 
+    @Getter
+    private List<Player> staff = new ArrayList<>();
+
     @Override
     public void onEnable() {
         instance = this;
@@ -68,6 +71,7 @@ public final class Moderation extends JavaPlugin {
         instance = null;
         DbManager.close();
         chatCooldown.clear();
+        staff.clear();
 
         getLogger().info("Moderation plugin disabled!");
 

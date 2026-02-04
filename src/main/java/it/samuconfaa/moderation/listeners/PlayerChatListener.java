@@ -94,11 +94,12 @@ public class PlayerChatListener implements Listener {
     }
 
     private void sendStaffMessage(String message, Player player) {
-        List<Player> staff = Bukkit.getOnlinePlayers().stream()
-                .filter(p -> p.hasPermission("moderation.staff"))
-                .collect(Collectors.toList());
-        staff.forEach(p -> p.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f));
-        staff.forEach(p -> p.sendMessage(plugin.getConfigManager().getStaffMessage().replace("%player%", player.getName()).replace("%word%", message)));
+        for(Player staff : plugin.getStaff()){
+            if (staff != null && staff.isOnline()) {
+                staff.sendMessage(plugin.getConfigManager().getStaffMessage().replace("%player%", player.getName()).replace("%word%", message));
+                staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
+            }
+        }
     }
 
     private int countLetters(String message) {

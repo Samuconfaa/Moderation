@@ -90,8 +90,7 @@ public class SignChangeListener implements Listener {
                 .collect(Collectors.toList());
 
         Bukkit.getScheduler().runTask(plugin, () -> {
-            for (UUID uuid : staffUUIDs) {
-                Player staff = Bukkit.getPlayer(uuid);
+            for(Player staff : plugin.getStaff()){
                 if (staff != null && staff.isOnline()) {
                     staff.sendMessage(message);
                     staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
