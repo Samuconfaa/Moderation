@@ -7,6 +7,7 @@ import it.samuconfaa.moderation.listeners.PlayerQuitListener;
 import it.samuconfaa.moderation.listeners.SignChangeListener;
 import it.samuconfaa.moderation.managers.ConfigManager;
 import it.samuconfaa.moderation.managers.DbManager;
+import it.samuconfaa.moderation.managers.ImportExportManager;
 import it.samuconfaa.moderation.managers.LicenseManager;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +29,9 @@ public final class Moderation extends JavaPlugin {
 
     @Getter
     private ConfigManager configManager;
+
+    @Getter
+    private ImportExportManager importExportManager;
 
     @Getter
     private int playerCacheTaskId = -1;
@@ -51,6 +56,9 @@ public final class Moderation extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.load();
 
+        importExportManager = new ImportExportManager(this);
+
+        createDir();
         String pluginName = "Moderation";
         String rawKey = getConfigManager().getLicenseKey();
         if (rawKey == null || rawKey.isEmpty()) {
@@ -75,6 +83,19 @@ public final class Moderation extends JavaPlugin {
         getLogger().info("-------------------------------");
         getLogger().info("Moderation plugin enabled!");
         getLogger().info("-------------------------------");
+    }
+
+    private void createDir() {
+        File importsFolder = new File(getDataFolder(), "imports");
+        File exportsFolder = new File(getDataFolder(), "exports");
+        if (!importsFolder.exists()) {
+            importsFolder.mkdirs();
+            getLogger().info("Created imports folder: " + importsFolder.getAbsolutePath());
+        }
+        if (!exportsFolder.exists()) {
+            exportsFolder.mkdirs();
+            getLogger().info("Created exports folder: " + exportsFolder.getAbsolutePath());
+        }
     }
 
     @Override

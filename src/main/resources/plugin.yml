@@ -8,7 +8,7 @@ author: samuconfaa
 commands:
   moderation:
     description: "Comando principale per gestire la moderazione chat"
-    usage: "/moderation <add|remove|check|reload> [word]"
+    usage: "/moderation <add|remove|check|reload|export|import|history> [args]"
 
 permissions:
   moderation.admin:
@@ -22,6 +22,8 @@ permissions:
       moderation.remove: true
       moderation.history: true
       moderation.bypass: true
+      moderation.export: true
+      moderation.import: true
 
   moderation.staff:
     description: "Per ricevere le segnalazioni"
@@ -49,4 +51,12 @@ permissions:
 
   moderation.bypass:
     description: "Permette di inviare tutti i messaggi senza censure"
+    default: op
+
+  moderation.export:
+    description: "Permette di esportare blacklist e whitelist"
+    default: op
+
+  moderation.import:
+    description: "Permette di importare blacklist e whitelist"
     default: op

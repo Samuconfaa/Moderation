@@ -12,6 +12,7 @@ import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,158 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
         }
 
         String sub = args[0].toLowerCase();
+
+        if (sub.equals("export")) {
+            if (!sender.hasPermission("moderation.export")) {
+                sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+                return true;
+            }
+
+            if (args.length != 3) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cUsage: /moderation export <blacklist|whitelist> <json|txt>");
+                return true;
+            }
+
+            String type = args[1].toLowerCase();
+            String format = args[2].toLowerCase();
+
+            if (!type.equals("blacklist") && !type.equals("whitelist")) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cType must be: blacklist or whitelist");
+                return true;
+            }
+
+            if (!format.equals("json") && !format.equals("txt")) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cFormat must be: json or txt");
+                return true;
+            }
+
+            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§eExporting " + type + " in " + format.toUpperCase() + " format...");
+
+            if (type.equals("blacklist")) {
+                if (format.equals("json")) {
+                    plugin.getImportExportManager().exportBlacklistJSON((success, file, count, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                        }
+                    });
+                } else {
+                    plugin.getImportExportManager().exportBlacklistTXT((success, file, count, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                        }
+                    });
+                }
+            } else {
+                if (format.equals("json")) {
+                    plugin.getImportExportManager().exportWhitelistJSON((success, file, count, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                        }
+                    });
+                } else {
+                    plugin.getImportExportManager().exportWhitelistTXT((success, file, count, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                        }
+                    });
+                }
+            }
+            return true;
+        }
+
+        if (sub.equals("import")) {
+            if (!sender.hasPermission("moderation.import")) {
+                sender.sendMessage(plugin.getConfigManager().getNoPermissionMessage());
+                return true;
+            }
+
+            if (args.length < 4 || args.length > 5) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cUsage: /moderation import <blacklist|whitelist> <json|txt> <filename> [merge|replace]");
+                return true;
+            }
+
+            String type = args[1].toLowerCase();
+            String format = args[2].toLowerCase();
+            String filename = args[3];
+            boolean merge = true;
+
+            if (args.length == 5) {
+                String mode = args[4].toLowerCase();
+                if (mode.equals("replace")) {
+                    merge = false;
+                } else if (!mode.equals("merge")) {
+                    sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cMode must be: merge or replace");
+                    return true;
+                }
+            }
+
+            if (!type.equals("blacklist") && !type.equals("whitelist")) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cType must be: blacklist or whitelist");
+                return true;
+            }
+
+            if (!format.equals("json") && !format.equals("txt")) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cFormat must be: json or txt");
+                return true;
+            }
+
+            File file = new File(plugin.getDataFolder(), "imports/" + filename);
+            if (!file.exists()) {
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cFile not found: §7imports/" + filename);
+                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§7Place the file in: §e" + plugin.getDataFolder().getAbsolutePath() + "/imports/");
+                return true;
+            }
+
+            String modeText = merge ? "merge" : "replace";
+            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§eImporting " + type + " from §7" + filename + " §e(" + modeText + ")...");
+
+            if (type.equals("blacklist")) {
+                if (format.equals("json")) {
+                    plugin.getImportExportManager().importBlacklistJSON(file, merge, (success, added, skipped, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                        }
+                    });
+                } else {
+                    plugin.getImportExportManager().importBlacklistTXT(file, merge, (success, added, skipped, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                        }
+                    });
+                }
+            } else {
+                if (format.equals("json")) {
+                    plugin.getImportExportManager().importWhitelistJSON(file, merge, (success, added, skipped, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                        }
+                    });
+                } else {
+                    plugin.getImportExportManager().importWhitelistTXT(file, merge, (success, added, skipped, error) -> {
+                        if (success) {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                        } else {
+                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                        }
+                    });
+                }
+            }
+            return true;
+        }
 
         // -----------------------------------------------
         if (sub.equals("check")) {
@@ -241,7 +394,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            List<String> commands = List.of("reload", "add", "remove", "check", "history");
+            List<String> commands = List.of("reload", "add", "remove", "check", "history", "export", "import");
             List<String> allowed = new ArrayList<>();
 
             for (String cmd : commands) {
@@ -260,6 +413,12 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                     }
                     case "check" -> {
                         if (sender.hasPermission("moderation.check")) allowed.add(cmd);
+                    }
+                    case "export" -> {
+                        if (sender.hasPermission("moderation.export")) allowed.add(cmd);
+                    }
+                    case "import" -> {
+                        if (sender.hasPermission("moderation.import")) allowed.add(cmd);
                     }
                 }
             }
@@ -293,6 +452,20 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 return completions;
             }
 
+            if (subCommand.equals("export") && sender.hasPermission("moderation.export")) {
+                List<String> types = List.of("blacklist", "whitelist");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[1], types, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+
+            if (subCommand.equals("import") && sender.hasPermission("moderation.import")) {
+                List<String> types = List.of("blacklist", "whitelist");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[1], types, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+
             if (subCommand.equals("history") && sender.hasPermission("moderation.history")) {
                 List<String> playerNames = Bukkit.getOnlinePlayers().stream()
                         .map(org.bukkit.entity.Player::getName)
@@ -310,8 +483,49 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 return List.of();
             }
 
+            if ((subCommand.equals("export") || subCommand.equals("import")) &&
+                    (sender.hasPermission("moderation.export") || sender.hasPermission("moderation.import"))) {
+                List<String> formats = List.of("json", "txt");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[2], formats, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
+            }
+
             if (subCommand.equals("history") && sender.hasPermission("moderation.history")) {
                 return List.of("5", "10", "20", "50", "100");
+            }
+        }
+
+        if (args.length == 4) {
+            String subCommand = args[0].toLowerCase();
+
+            if (subCommand.equals("import") && sender.hasPermission("moderation.import")) {
+                File importsFolder = new File(plugin.getDataFolder(), "imports");
+                if (importsFolder.exists() && importsFolder.isDirectory()) {
+                    File[] files = importsFolder.listFiles();
+                    if (files != null) {
+                        List<String> fileNames = new ArrayList<>();
+                        for (File file : files) {
+                            if (file.isFile()) {
+                                fileNames.add(file.getName());
+                            }
+                        }
+                        org.bukkit.util.StringUtil.copyPartialMatches(args[3], fileNames, completions);
+                        completions.sort(String::compareToIgnoreCase);
+                        return completions;
+                    }
+                }
+            }
+        }
+
+        if (args.length == 5) {
+            String subCommand = args[0].toLowerCase();
+
+            if (subCommand.equals("import") && sender.hasPermission("moderation.import")) {
+                List<String> modes = List.of("merge", "replace");
+                org.bukkit.util.StringUtil.copyPartialMatches(args[4], modes, completions);
+                completions.sort(String::compareToIgnoreCase);
+                return completions;
             }
         }
 

@@ -1,5 +1,5 @@
 config-version: 1 #don't modify!!!
-license-key: "MH5ZfFJyu45Y2oOY58K4e1UQScdHMGWZqo7BBAO5"
+license-key: "Wb5AQ0Q48DhMskSkwNxYmpwQKU2Wrrwh1h3mMjfG"
 
 database:
   name: "database.db"
@@ -14,7 +14,7 @@ caps-options:
   min-letters: 2
 
 messages:
-  prefix: "&8&l[&6/lModeration&8&l] "
+  prefix: "&8&l[&6&lModeration&8&l] "
   noDelay: "&cYou must wait %time% seconds before sending a message again!"
   no-permission: "&cYou don't have permission to do that!"
   addWordToBlacklist: "&aSuccessfully added to the blacklist!"
@@ -23,8 +23,8 @@ messages:
   removeWordFromWhitelist: "&aSuccessfully removed from the whitelist!"
   notBlacklisted: "&cThis word is not blacklisted!"
   blacklisted: "&cThis word is blacklisted!"
-  notWhitelisted: "&cThis word is not blacklisted!"
-  whitelisted: "&cThis word is blacklisted!"
+  notWhitelisted: "&cThis word is not whitelisted!"
+  whitelisted: "&cThis word is whitelisted!"
   reload: "&aSuccessfully reloaded the config!"
   usage: "&cUsage: /moderation <add|remove|check> <blacklist|whitelist> <word>"
   usageHistory: "&cUsage: /moderation history <player> {limit}"
@@ -38,11 +38,19 @@ messages:
   help:
     - "&6========== MODERATION HELP =========="
     - ""
-    - "&a/moderation add <blacklist|whitelist> <word>  &7- Add a word to the blacklist"
-    - "&a/moderation remove <blacklist|whitelist> <word>  &7- Remove a word from the blacklist"
-    - "&a/moderation check <blacklist|whitelist> <word>  &7- Check if a word is blacklisted"
+    - "&e&lBasic Commands:"
+    - "&a/moderation add <blacklist|whitelist> <word>  &7- Add a word"
+    - "&a/moderation remove <blacklist|whitelist> <word>  &7- Remove a word"
+    - "&a/moderation check <blacklist|whitelist> <word>  &7- Check a word"
     - "&a/moderation reload  &7- Reload the config"
-    - "&a/moderation history <player> {limit} &7- Check the history of a player"
+    - "&a/moderation history <player> {limit}  &7- Check player history"
+    - ""
+    - "&e&lImport/Export:"
+    - "&a/moderation export <blacklist|whitelist> <json|txt>  &7- Export list"
+    - "&a/moderation import <blacklist|whitelist> <json|txt> <file> [merge|replace]  &7- Import list"
+    - ""
+    - "&7Example: &f/moderation export blacklist json"
+    - "&7Example: &f/moderation import blacklist txt mylist.txt merge"
     - ""
     - "&6====================================="
   player-history:
@@ -55,6 +63,4 @@ messages:
       - ""
     footer: "&6====================================="
   staff-segnalation: "&c%player% has sent a message with %word%"
-  staff-sign-segnalation: "&c%player% has place a sign with '%word%' in %location%"
-
-
+  staff-sign-segnalation: "&c%player% has placed a sign with '%word%' in %location%"
