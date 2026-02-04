@@ -32,9 +32,6 @@ public final class Moderation extends JavaPlugin {
     private ImportExportManager importExportManager;
 
     @Getter
-    private int playerCacheTaskId = -1;
-
-    @Getter
     private final Set<String> cachedPlayerNames = ConcurrentHashMap.newKeySet();
 
     @Getter
@@ -75,7 +72,7 @@ public final class Moderation extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 
         DbManager.init(this);
-        
+
         startCooldownCleanupTask();
         startBackupTask();
 

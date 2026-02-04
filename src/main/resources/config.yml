@@ -16,6 +16,20 @@ caps-options:
 import-export:
   backup-delay: 15 #minute
   default-extension: "txt"  #txt | json
+  export-usage: "&cUsage: /moderation export <blacklist|whitelist> <json|txt>"
+  type-error: "&cType must be: blacklist or whitelist"
+  format-error: "cFormat must be: json or txt"
+  exporting-message: "&eExporting %type% in %format% format..."
+  exported-message: "&aExported &e%count% &awords to: &7%file%"
+  export-error: "&cExport failed: %error%"
+  #--------------------------------------------------------------------
+  import-usage: "&cUsage: /moderation import <blacklist|whitelist> <json|txt> <filename> [merge|replace]"
+  mode-error: "&cMode must be: merge or replace"
+  file-not-found: "&File not found: §7imports/%file%"
+  file-suggest: "&7Place the file in: %path%/imports/"
+  importing-message: "&eImporting %type% from &7%file%. &e(%mode%)..."
+  imported-message: "&aImport completed! Added: &e%count% &7| Skipped %skipped%"
+  import-error: "&cImport failed: %error%"
 
 messages:
   prefix: "&8&l[&6&lModeration&8&l] "

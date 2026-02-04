@@ -43,7 +43,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             }
 
             if (args.length != 3) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cUsage: /moderation export <blacklist|whitelist> <json|txt>");
+                sender.sendMessage(plugin.getConfigManager().getExportErrorMessage());
                 return true;
             }
 
@@ -51,32 +51,32 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             String format = args[2].toLowerCase();
 
             if (!type.equals("blacklist") && !type.equals("whitelist")) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cType must be: blacklist or whitelist");
+                sender.sendMessage(plugin.getConfigManager().getTypeErrorMessage());
                 return true;
             }
 
             if (!format.equals("json") && !format.equals("txt")) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cFormat must be: json or txt");
+                sender.sendMessage(plugin.getConfigManager().getFormatErrorMessage());
                 return true;
             }
 
-            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§eExporting " + type + " in " + format.toUpperCase() + " format...");
+            sender.sendMessage(plugin.getConfigManager().getExportingMessage().replace("%format%", format.toUpperCase()).replace("%type%", type));
 
             if (type.equals("blacklist")) {
                 if (format.equals("json")) {
                     plugin.getImportExportManager().exportBlacklistJSON((success, file, count, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                            sender.sendMessage(plugin.getConfigManager().getExportedMessage().replace("%count%", count+"").replace("%file%", file.getName()));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getExportErrorMessage().replace("%error%", error));
                         }
                     });
                 } else {
                     plugin.getImportExportManager().exportBlacklistTXT((success, file, count, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                            sender.sendMessage(plugin.getConfigManager().getExportedMessage().replace("%count%", count+"").replace("%file%", file.getName()));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getExportErrorMessage().replace("%error%", error));
                         }
                     });
                 }
@@ -84,17 +84,17 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 if (format.equals("json")) {
                     plugin.getImportExportManager().exportWhitelistJSON((success, file, count, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                            sender.sendMessage(plugin.getConfigManager().getExportedMessage().replace("%count%", count+"").replace("%file%", file.getName()));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getExportErrorMessage().replace("%error%", error));
                         }
                     });
                 } else {
                     plugin.getImportExportManager().exportWhitelistTXT((success, file, count, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aExported §e" + count + " §awords to: §7" + file.getName());
+                            sender.sendMessage(plugin.getConfigManager().getExportedMessage().replace("%count%", count+"").replace("%file%", file.getName()));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cExport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getExportErrorMessage().replace("%error%", error));
                         }
                     });
                 }
@@ -110,7 +110,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             }
 
             if (args.length < 4 || args.length > 5) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cUsage: /moderation import <blacklist|whitelist> <json|txt> <filename> [merge|replace]");
+                sender.sendMessage(plugin.getConfigManager().getImportUsageMessage());
                 return true;
             }
 
@@ -130,40 +130,40 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
             }
 
             if (!type.equals("blacklist") && !type.equals("whitelist")) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cType must be: blacklist or whitelist");
+                sender.sendMessage(plugin.getConfigManager().getTypeErrorMessage());
                 return true;
             }
 
             if (!format.equals("json") && !format.equals("txt")) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cFormat must be: json or txt");
+                sender.sendMessage(plugin.getConfigManager().getFormatErrorMessage());
                 return true;
             }
 
             File file = new File(plugin.getDataFolder(), "imports/" + filename);
             if (!file.exists()) {
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cFile not found: §7imports/" + filename);
-                sender.sendMessage(plugin.getConfigManager().getPrefix() + "§7Place the file in: §e" + plugin.getDataFolder().getAbsolutePath() + "/imports/");
+                sender.sendMessage(plugin.getConfigManager().getFileNotFoundMessage().replace("%file%", filename));
+                sender.sendMessage(plugin.getConfigManager().getFileSuggestMessage().replace("%path%", plugin.getDataFolder().getAbsolutePath()));
                 return true;
             }
 
             String modeText = merge ? "merge" : "replace";
-            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§eImporting " + type + " from §7" + filename + " §e(" + modeText + ")...");
+            sender.sendMessage(plugin.getConfigManager().getImportingMessage().replace("type", type).replace("%file%",filename).replace("%mode%", modeText));
 
             if (type.equals("blacklist")) {
                 if (format.equals("json")) {
                     plugin.getImportExportManager().importBlacklistJSON(file, merge, (success, added, skipped, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                            sender.sendMessage(plugin.getConfigManager().getImportedMessage().replace("%count%", added+"").replace("%skipped%", skipped+""));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getImportErrorMessage().replace("%error%", error));
                         }
                     });
                 } else {
                     plugin.getImportExportManager().importBlacklistTXT(file, merge, (success, added, skipped, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                            sender.sendMessage(plugin.getConfigManager().getImportedMessage().replace("%count%", added+"").replace("%skipped%", skipped+""));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getImportErrorMessage().replace("%error%", error));
                         }
                     });
                 }
@@ -171,17 +171,17 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                 if (format.equals("json")) {
                     plugin.getImportExportManager().importWhitelistJSON(file, merge, (success, added, skipped, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                            sender.sendMessage(plugin.getConfigManager().getImportedMessage().replace("%count%", added+"").replace("%skipped%", skipped+""));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getImportErrorMessage().replace("%error%", error));
                         }
                     });
                 } else {
                     plugin.getImportExportManager().importWhitelistTXT(file, merge, (success, added, skipped, error) -> {
                         if (success) {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§aImport completed! Added: §e" + added + " §7| Skipped: §e" + skipped);
+                            sender.sendMessage(plugin.getConfigManager().getImportedMessage().replace("%count%", added+"").replace("%skipped%", skipped+""));
                         } else {
-                            sender.sendMessage(plugin.getConfigManager().getPrefix() + "§cImport failed: " + error);
+                            sender.sendMessage(plugin.getConfigManager().getImportErrorMessage().replace("%error%", error));
                         }
                     });
                 }

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class ConfigManager {
 
     private final Moderation plugin;
@@ -18,85 +19,61 @@ public class ConfigManager {
     }
 
     //--------------------------------------------------------------------------------------------
-    @Getter
     private String licenseKey;
 
-    @Getter
     private String DbName;
-    @Getter
     private int historyLimit;
-    @Getter
     private int maxWordCharacter;
 
-    @Getter
     private long backupDelay;
-    @Getter
     private String defaultExtension;
+    private String exportUsageMessage;
+    private String typeErrorMessage;
+    private String formatErrorMessage;
+    private String exportingMessage;
+    private String exportedMessage;
+    private String exportErrorMessage;
+    private String importUsageMessage;
+    private String modeErrorMessage;
+    private String fileNotFoundMessage;
+    private String fileSuggestMessage;
+    private String importingMessage;
+    private String importedMessage;
+    private String importErrorMessage;
 
-    @Getter
     private String prefix;
-    @Getter
     private String noPermissionMessage;
-    @Getter
     private String addWordToBlacklistMessage;
-    @Getter
     private String removeWordFromBlacklistMessage;
-    @Getter
     private String addWordToWhitelistMessage;
-    @Getter
     private String removeWordFromWhitelistMessage;
 
-    @Getter
     private String reloadMessage;
-    @Getter
     private String usageMessage;
-    @Getter
     private String usageHistoryMessage;
-    @Getter
     private String noWordMessage;
-    @Getter
     private String blacklistedMessage;
-    @Getter
     private String notBlacklistedMessage;
-    @Getter
     private String whitelistedMessage;
-    @Getter
     private String notWhitelistedMessage;
-    @Getter
     private String onlyPlayerMessage;
-    @Getter
     private String noCapsMessage;
-    @Getter
     private String noDelayMessage;
-    @Getter
     private List<String> helpMessage;
-    @Getter
     private String staffMessage;
-    @Getter
     private String staffSignMessage;
-    @Getter
     private String onlyIntegerMessage;
-    @Getter
     private String noEmptyWordsMessage;
-    @Getter
     private String wordTooLongMessage;
-    @Getter
     private String onlyLettersNumbersMessage;
 
-    @Getter
     private String historyHeader;
-    @Getter
     private String historyFooter;
-    @Getter
     private List<String> historyBody;
 
-    @Getter
     private int maxCaps;
-    @Getter
     private int minLetters;
-    @Getter
     private long messageDelay;
-    @Getter
     private long intervalCheck;
 
     //--------------------------------------------------------------------------------------------
@@ -113,6 +90,19 @@ public class ConfigManager {
 
         backupDelay = plugin.getConfig().getLong("import-export.backup-delay") * 60 * 20;
         defaultExtension = plugin.getConfig().getString("import-export.default-extension", "txt").toLowerCase();
+        exportUsageMessage = color(plugin.getConfig().getString("import-export.export-usage"));
+        typeErrorMessage = color(plugin.getConfig().getString("import-export.type-error"));
+        formatErrorMessage = color(plugin.getConfig().getString("import-export.format-error"));
+        exportingMessage = color(plugin.getConfig().getString("import-export.exporting-message"));
+        exportedMessage = color(plugin.getConfig().getString("import-export.exported-message"));
+        exportErrorMessage = color(plugin.getConfig().getString("import-export.export-error"));
+        importUsageMessage = color(plugin.getConfig().getString("import-export.import-usage"));
+        modeErrorMessage = color(plugin.getConfig().getString("import-export.mode-error"));
+        fileNotFoundMessage = color(plugin.getConfig().getString("import-export.file-not-found"));
+        fileSuggestMessage = color(plugin.getConfig().getString("import-export.file-suggest"));
+        importingMessage = color(plugin.getConfig().getString("import-export.importing-message"));
+        importedMessage = color(plugin.getConfig().getString("import-export.imported-message"));
+        importErrorMessage = color(plugin.getConfig().getString("import-export.import-error"));
 
         prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.prefix"));
         noPermissionMessage = getConfigString("messages.no-permission");
@@ -150,7 +140,6 @@ public class ConfigManager {
         intervalCheck = plugin.getConfig().getLong("check-interval");
 
     }
-
 
     private void checkAndUpdateConfig() {
         int currentVersion = plugin.getConfig().getInt("config-version", 0);
@@ -227,6 +216,7 @@ public class ConfigManager {
 
     //--------------------------------------------------------------------------------------------
     private String color(String msg) {
+        if (msg == null) return "";
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
 

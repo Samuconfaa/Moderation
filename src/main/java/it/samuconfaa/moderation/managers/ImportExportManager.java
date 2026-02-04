@@ -29,7 +29,6 @@ public class ImportExportManager {
 
     // ==================== EXPORT ====================
 
-
     public void exportBlacklistJSON(ExportCallback callback) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
