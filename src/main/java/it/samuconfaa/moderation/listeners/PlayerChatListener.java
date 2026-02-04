@@ -12,6 +12,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class PlayerChatListener implements Listener {
     private Moderation plugin;
@@ -33,21 +34,28 @@ public class PlayerChatListener implements Listener {
 
     private void checkTime(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
 
-        if (plugin.getChatCooldown().containsKey(player.getUniqueId())) {
-            long millis = plugin.getChatCooldown().get(player.getUniqueId());
+        Long lastMessageTime = plugin.getChatCooldown().getIfPresent(uuid);
+
+        if (lastMessageTime != null) {
             long delay = plugin.getConfigManager().getMessageDelay();
-            long diff = now - millis;
-            if(diff < delay){
-                int seconds = (int) (delay - diff) / 1000;
-                player.sendMessage(plugin.getConfigManager().getNoDelayMessage().replace("%time%", seconds+""));
+            long diff = now - lastMessageTime;
+
+            if (diff < delay) {
+                long secondsLeft = Math.max(1, (delay - diff) / 1000);
+
+                String message = plugin.getConfigManager().getNoDelayMessage()
+                        .replace("%time%", String.valueOf(secondsLeft));
+
+                player.sendMessage(message);
                 event.setCancelled(true);
                 return;
             }
         }
 
-        plugin.getChatCooldown().put(player.getUniqueId(), now);
+        plugin.getChatCooldown().put(uuid, now);
     }
 
 

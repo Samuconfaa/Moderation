@@ -103,17 +103,18 @@ public final class Moderation extends JavaPlugin {
 
     private void startBackupTask(){
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () ->{
+            ImportExportManager.ExportCallback callback = (success, file, count, error) -> {};
             String def = getConfigManager().getDefaultExtension();
             if(!(def.equals("txt") || def.equals("json"))) {
                 def = "txt";
                 getLogger().warning("Default extension not set or set incorrectly. Now is " + def);
             }
             if(def.equals("txt")){
-                getImportExportManager().exportBlacklistTXT(null);
-                getImportExportManager().exportWhitelistTXT(null);
+                getImportExportManager().exportBlacklistTXT(callback);
+                getImportExportManager().exportWhitelistTXT(callback);
             }else if(def.equals("json")){
-                getImportExportManager().exportBlacklistJSON(null);
-                getImportExportManager().exportWhitelistJSON(null);
+                getImportExportManager().exportBlacklistJSON(callback);
+                getImportExportManager().exportWhitelistJSON(callback);
             }
         }, 0L, getConfigManager().getBackupDelay());
     }
