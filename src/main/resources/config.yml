@@ -13,7 +13,7 @@ caps-options:
   min-letters: 3
 
 messages:
-  prefix: "&8[&6Moderation&8] "
+  prefix: "&8&l[&6/lModeration&8&l] "
   noDelay: "&cYou must wait %time% seconds before sending a message again!"
   no-permission: "&cYou don't have permission to do that!"
   addWord: "&aSuccessfully added to the blacklist!"

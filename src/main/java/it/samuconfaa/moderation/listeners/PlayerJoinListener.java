@@ -1,6 +1,7 @@
 package it.samuconfaa.moderation.listeners;
 
 import it.samuconfaa.moderation.Moderation;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,9 +18,11 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event){
         Player p = event.getPlayer();
         if(p.hasPermission("moderation.admin")){
-            if(plugin.isUpdate()){
-                p.sendMessage("§6§l[Moderation] §eA new version of the plugin is available!");
-            }
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if(plugin.isUpdate()){
+                    p.sendMessage("§6§l[Moderation] §eA new version of the plugin is available!");
+                }
+            }, 60L);
         }
 
         if(p.hasPermission("moderation.staff")){
