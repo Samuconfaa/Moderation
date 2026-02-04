@@ -2,9 +2,8 @@ package it.samuconfaa.moderation.listeners;
 
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
-import it.samuconfaa.moderation.models.DbSegnalationModel;
 import it.samuconfaa.moderation.models.EnumAction;
-import org.bukkit.Bukkit;
+import it.samuconfaa.moderation.utils.TextNormalizer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PlayerChatListener implements Listener {
     private Moderation plugin;
@@ -47,26 +45,10 @@ public class PlayerChatListener implements Listener {
         plugin.getChatCooldown().put(player.getUniqueId(), now);
     }
 
-    private String serializeText(String line) {
-        StringBuilder sb = new StringBuilder(line.toLowerCase());
-        for (int i = 0; i < sb.length(); i++) {
-            char c = sb.charAt(i);
-            switch (c) {
-                case '4' -> sb.setCharAt(i, 'a');
-                case '3' -> sb.setCharAt(i, 'e');
-                case '1' -> sb.setCharAt(i, 'i');
-                case '0' -> sb.setCharAt(i, 'o');
-                case '5' -> sb.setCharAt(i, 's');
-                case '7' -> sb.setCharAt(i, 't');
-                case '@' -> sb.setCharAt(i, 'a');
-            }
-        }
-        return sb.toString();
-    }
 
     private void capsFilter(AsyncPlayerChatEvent event){
         if (event.isCancelled()) return;
-        String message = serializeText(event.getMessage());
+        String message = TextNormalizer.normalize(event.getMessage());
         Player player = event.getPlayer();
         List<String> names = plugin.getCachedPlayerNames();
 

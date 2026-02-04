@@ -2,8 +2,8 @@ package it.samuconfaa.moderation.listeners;
 
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.managers.DbManager;
-import it.samuconfaa.moderation.models.DbSegnalationModel;
 import it.samuconfaa.moderation.models.EnumAction;
+import it.samuconfaa.moderation.utils.TextNormalizer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
@@ -33,7 +33,7 @@ public class SignChangeListener implements Listener {
             String line = PlainTextComponentSerializer.plainText().serialize(event.line(i));
             fullText.append(line).append(" ");
         }
-        String text = serializeText(fullText.toString());
+        String text = TextNormalizer.normalize(fullText.toString());
         String found = DbManager.containsBlacklistedWordCached(text, plugin);
         if (found != null) {
             event.setCancelled(true);
@@ -44,23 +44,6 @@ public class SignChangeListener implements Listener {
             });
         }
 
-    }
-
-    private String serializeText(String line) {
-        StringBuilder sb = new StringBuilder(line.toLowerCase());
-        for (int i = 0; i < sb.length(); i++) {
-            char c = sb.charAt(i);
-            switch (c) {
-                case '4' -> sb.setCharAt(i, 'a');
-                case '3' -> sb.setCharAt(i, 'e');
-                case '1' -> sb.setCharAt(i, 'i');
-                case '0' -> sb.setCharAt(i, 'o');
-                case '5' -> sb.setCharAt(i, 's');
-                case '7' -> sb.setCharAt(i, 't');
-                case '@' -> sb.setCharAt(i, 'a');
-            }
-        }
-        return sb.toString();
     }
 
     private void sendStaffMessage(String word, Player player, Location loc) {
