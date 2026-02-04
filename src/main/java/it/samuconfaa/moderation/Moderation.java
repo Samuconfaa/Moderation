@@ -16,12 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
+
 
 public final class Moderation extends JavaPlugin {
     @Getter
@@ -77,6 +75,7 @@ public final class Moderation extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
 
         DbManager.init(this);
+        
         startCooldownCleanupTask();
         startBackupTask();
 
@@ -115,7 +114,6 @@ public final class Moderation extends JavaPlugin {
             }
         }, 0L, getConfigManager().getBackupDelay());
     }
-    
 
     private void createDir() {
         File importsFolder = new File(getDataFolder(), "imports");
