@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import it.samuconfaa.moderation.Moderation;
 import it.samuconfaa.moderation.models.DbSegnalationModel;
+import it.samuconfaa.moderation.models.EnumAction;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public class DbManager {
                     playerUUID TEXT NOT NULL,
                     message TEXT NOT NULL,
                     data_ora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    action TEXT NOT NULL
+                    enumAction TEXT NOT NULL
                 );
             """;
 
@@ -233,10 +234,10 @@ public class DbManager {
      */
 
     //===============METODI HISTORY==========================
-    public static void addHistory(Moderation plugin, String playerUUID, String message, DbSegnalationModel.Action action) {
+    public static void addHistory(Moderation plugin, String playerUUID, String message, EnumAction enumAction) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->{
             String sql = """
-                INSERT INTO history (playerUUID, message, action)
+                INSERT INTO history (playerUUID, message, enumAction)
                 VALUES (?, ?, ?)
             """;
 
@@ -245,7 +246,7 @@ public class DbManager {
 
                 ps.setString(1, playerUUID);
                 ps.setString(2, message);
-                ps.setString(3, action.name());
+                ps.setString(3, enumAction.name());
                 ps.executeUpdate();
 
             } catch (Exception e) {
@@ -263,7 +264,7 @@ public class DbManager {
             List<DbSegnalationModel> history = new ArrayList<>();
 
             String sql = """
-                SELECT id, playerUUID, message, data_ora, action
+                SELECT id, playerUUID, message, data_ora, enumAction
                 FROM history
                 WHERE playerUUID = ?
                 ORDER BY data_ora DESC
@@ -278,13 +279,13 @@ public class DbManager {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
 
-                        DbSegnalationModel.Action action;
+                        EnumAction enumAction;
                         try {
-                            action = DbSegnalationModel.Action.valueOf(
-                                    rs.getString("action")
+                            enumAction = EnumAction.valueOf(
+                                    rs.getString("enumAction")
                             );
                         } catch (Exception e) {
-                            action = DbSegnalationModel.Action.PLUGIN_ERROR;
+                            enumAction = EnumAction.PLUGIN_ERROR;
                         }
 
                         DbSegnalationModel model = new DbSegnalationModel(
@@ -292,7 +293,7 @@ public class DbManager {
                                 UUID.fromString(rs.getString("playerUUID")),
                                 rs.getString("message"),
                                 rs.getTimestamp("data_ora"),
-                                action
+                                enumAction
                         );
 
                         history.add(model);
