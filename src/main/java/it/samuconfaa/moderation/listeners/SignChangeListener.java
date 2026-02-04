@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class SignChangeListener implements Listener {
@@ -26,18 +27,33 @@ public class SignChangeListener implements Listener {
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
         Location loc = event.getBlock().getLocation();
+        StringBuilder fullText = new StringBuilder();
         for (int i = 0; i < event.lines().size(); i++) {
             String line = PlainTextComponentSerializer.plainText().serialize(event.line(i));
-
-            String found = DbManager.containsBlacklistedWordCached(line, plugin);
-
-            if (found != null) {
-                event.setCancelled(true);
-                player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
-                sendStaffMessage(found, player, loc);
-                return;
-            }
+            fullText.append(line).append(" ");
         }
+        String text = serializeText(fullText.toString());
+        String found = DbManager.containsBlacklistedWordCached(text, plugin);
+        if (found != null) {
+            event.setCancelled(true);
+            player.sendMessage(plugin.getConfigManager().getBlacklistedMessage());
+
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                sendStaffMessage(found, player, loc);
+            });
+        }
+
+    }
+
+    private String serializeText(String line) {
+        return line.toLowerCase()
+                .replace("4", "a")
+                .replace("3", "e")
+                .replace("1", "i")
+                .replace("0", "o")
+                .replace("5", "s")
+                .replace("7", "t")
+                .replace("@", "a");
     }
 
     private void sendStaffMessage(String word, Player player, Location loc) {
@@ -46,27 +62,34 @@ public class SignChangeListener implements Listener {
         int z = loc.getBlockZ();
         String pos = "X: " + x + " Y: " + y + " Z: " + z;
 
-        String rawConfigMessage = plugin.getConfigManager().getStaffMessage()
+        String rawConfigMessage = plugin.getConfigManager().getStaffSignMessage()
                 .replace("%player%", player.getName())
                 .replace("%word%", word)
-                .replace("%location%", pos);
+                .replace("%location%", "X: " + x + " Y: " + y + " Z: " + z);
 
 
         net.md_5.bungee.api.chat.TextComponent message = new net.md_5.bungee.api.chat.TextComponent(rawConfigMessage);
         net.md_5.bungee.api.chat.TextComponent clickPart = new net.md_5.bungee.api.chat.TextComponent(" §7§o[Click Here to TP]");
 
-        clickPart.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
+        clickPart.setClickEvent(new ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
                 "/tp " + x + " " + y + " " + z
         ));
 
         message.addExtra(clickPart);
 
-        Bukkit.getOnlinePlayers().stream()
-                .filter(p -> p.hasPermission("moderation.staff"))
-                .forEach(p -> {
-                    p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-                    p.spigot().sendMessage(message);
-                });
+        List<UUID> staffUUIDs = Bukkit.getOnlinePlayers().stream()
+                .map(Player::getUniqueId)
+                .collect(Collectors.toList());
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (UUID uuid : staffUUIDs) {
+                Player staff = Bukkit.getPlayer(uuid);
+                if (staff != null && staff.isOnline()) {
+                    staff.sendMessage(message);
+                    staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                }
+            }
+        });
     }
 }

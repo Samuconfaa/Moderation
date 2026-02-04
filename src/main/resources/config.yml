@@ -1,3 +1,5 @@
+config-version: 2 #don't modify!!!
+
 database:
   name: "database.db"
 

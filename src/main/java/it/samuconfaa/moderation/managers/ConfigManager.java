@@ -3,12 +3,16 @@ package it.samuconfaa.moderation.managers;
 import it.samuconfaa.moderation.Moderation;
 import lombok.Getter;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.Sound;
 
 import java.util.List;
 
 public class ConfigManager {
 
     private final Moderation plugin;
+    private static final int CONFIG_VERSION = 1;
 
     public ConfigManager(Moderation plugin) {
         this.plugin = plugin;
@@ -55,15 +59,16 @@ public class ConfigManager {
     private int minLetters;
     @Getter
     private long messageDelay;
-
     @Getter
     private long intervalCheck;
+
     //--------------------------------------------------------------------------------------------
 
     public void load() {
+        checkAndUpdateConfig();
         plugin.reloadConfig();
 
-        DbName = getConfigString("database.name");
+        DbName = plugin.getConfig().getString("database.name");
 
         prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("messages.prefix"));
         noPermissionMessage = getConfigString("messages.no-permission");
@@ -74,7 +79,7 @@ public class ConfigManager {
         usageMessage = getConfigString("messages.usage");
         noWordMessage = getConfigString("messages.noWord");
         blacklistedMessage = getConfigString("messages.blacklisted");
-        onlyPlayerMessage = getConfigString("messages.onlyPlayer");
+        onlyPlayerMessage = getConfigString("messages.onlyPlayers");
         noCapsMessage = getConfigString("messages.noCaps");
         noDelayMessage = getConfigString("messages.noDelay");
         helpMessage = colorList(plugin.getConfig().getStringList("messages.help"));
@@ -84,9 +89,49 @@ public class ConfigManager {
         maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
         minLetters = plugin.getConfig().getInt("caps-options.min-letters");
         messageDelay = (long) plugin.getConfig().getInt("message-delay") * 1000L;
-
         intervalCheck = plugin.getConfig().getLong("check-interval");
 
+    }
+
+
+    private void checkAndUpdateConfig() {
+        int currentVersion = plugin.getConfig().getInt("config-version", 0);
+
+        if (currentVersion < CONFIG_VERSION) {
+            plugin.getLogger().warning("╔════════════════════════════════════════════╗");
+            plugin.getLogger().warning("║  CONFIG OUTDATED - Updating...             ║");
+            plugin.getLogger().warning("║  Old version: " + currentVersion + " → New version: " + CONFIG_VERSION + "       ║");
+            plugin.getLogger().warning("╚════════════════════════════════════════════╝");
+
+            backupConfig();
+
+            plugin.getConfig().getKeys(false).forEach(key ->
+                    plugin.getConfig().set(key, null)
+            );
+
+            plugin.saveDefaultConfig();
+            plugin.reloadConfig();
+
+            plugin.getLogger().info("✓ Config updated successfully!");
+            plugin.getLogger().info("✓ Old config backed up to config.yml.old");
+        }
+    }
+
+    private void backupConfig() {
+        try {
+            java.io.File configFile = new java.io.File(plugin.getDataFolder(), "config.yml");
+            java.io.File backupFile = new java.io.File(plugin.getDataFolder(), "config.yml.old");
+
+            if (configFile.exists()) {
+                java.nio.file.Files.copy(
+                        configFile.toPath(),
+                        backupFile.toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
+            }
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to backup config: " + e.getMessage());
+        }
     }
 
     //--------------------------------------------------------------------------------------------
@@ -102,5 +147,4 @@ public class ConfigManager {
     private List<String> colorList(List<String> list) {
         return list.stream().map(this::color).toList();
     }
-
 }

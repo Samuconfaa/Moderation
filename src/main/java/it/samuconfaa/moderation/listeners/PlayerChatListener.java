@@ -21,7 +21,6 @@ public class PlayerChatListener implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         capsFilter(event);
-
         if (!event.isCancelled()) {
             checkTime(event);
         }
@@ -46,9 +45,20 @@ public class PlayerChatListener implements Listener {
         plugin.getChatCooldown().put(player.getUniqueId(), now);
     }
 
+    private String serializeText(String line) {
+        return line.toLowerCase()
+                .replace("4", "a")
+                .replace("3", "e")
+                .replace("1", "i")
+                .replace("0", "o")
+                .replace("5", "s")
+                .replace("7", "t")
+                .replace("@", "a");
+    }
+
     private void capsFilter(AsyncPlayerChatEvent event){
         if (event.isCancelled()) return;
-        String message = event.getMessage();
+        String message = serializeText(event.getMessage());
         Player player = event.getPlayer();
         List<String> names = plugin.getCachedPlayerNames();
 
@@ -77,7 +87,7 @@ public class PlayerChatListener implements Listener {
         List<Player> staff = Bukkit.getOnlinePlayers().stream()
                 .filter(p -> p.hasPermission("moderation.staff"))
                 .collect(Collectors.toList());
-        staff.forEach(p -> p.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f));
+        staff.forEach(p -> p.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f));
         staff.forEach(p -> p.sendMessage(plugin.getConfigManager().getStaffMessage().replace("%player%", player.getName()).replace("%word%", message)));
     }
 
