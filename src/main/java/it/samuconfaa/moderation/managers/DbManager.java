@@ -184,15 +184,6 @@ public class DbManager {
         });
     }
 
-    public static String containsWhitelistedWord(String message, Moderation plugin) {
-        String msg = message.toLowerCase();
-
-        for (String word : BLACKLIST) {
-            if (msg.contains(word)) return word;
-        }
-        return null;
-    }
-
     //========= METODI DB BLACKLIST ============
 
     public static boolean isBlacklisted(String word) {
@@ -201,7 +192,6 @@ public class DbManager {
 
     public static String containsBlacklistedWord(String message) {
         String normalized = message.toLowerCase();
-
         String[] words = normalized.split("\\s+");
 
         for (String word : words) {
@@ -215,12 +205,26 @@ public class DbManager {
 
             for (String blacklisted : BLACKLIST) {
                 if (word.contains(blacklisted)) {
-                    return blacklisted;
+                    boolean isPartOfWhitelisted = false;
+                    for (String whitelisted : WHITELIST) {
+                        if (word.contains(whitelisted) && whitelisted.contains(blacklisted)) {
+                            isPartOfWhitelisted = true;
+                            break;
+                        }
+                    }
+                    if (!isPartOfWhitelisted) {
+                        return blacklisted;
+                    }
                 }
             }
         }
 
         String noSpaces = normalized.replaceAll("\\s+", "");
+
+        if (WHITELIST.contains(noSpaces)) {
+            return null;
+        }
+
         for (String blacklisted : BLACKLIST) {
             if (noSpaces.contains(blacklisted)) {
                 boolean isPartOfWhitelisted = false;

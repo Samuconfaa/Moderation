@@ -142,7 +142,7 @@ public class ModerationCommand implements CommandExecutor, TabCompleter {
                     String addWord = checkWord(args[2], sender);
                     if(addWord == null) return true;
                     if(type.equals("whitelist")){
-                        DbManager.removeWordFromBlacklist(addWord, plugin, () ->
+                        DbManager.removeWordFromWhitelist(addWord, plugin, () ->
                                 sender.sendMessage(plugin.getConfigManager().getAddWordToWhitelistMessage())
                         );
                         return true;
