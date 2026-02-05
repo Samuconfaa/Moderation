@@ -23,6 +23,11 @@ public class ConfigManager {
 
     private String DbName;
     private int historyLimit;
+    private int maxPoolSize;
+
+    private int maxPlayerCache;
+    private int expireTime;
+
     private int maxWordCharacter;
 
     private long backupDelay;
@@ -74,7 +79,6 @@ public class ConfigManager {
     private int maxCaps;
     private int minLetters;
     private long messageDelay;
-    private long intervalCheck;
 
     //--------------------------------------------------------------------------------------------
 
@@ -84,8 +88,13 @@ public class ConfigManager {
 
         licenseKey = plugin.getConfig().getString("license-key");
 
-        DbName = plugin.getConfig().getString("database.name");
-        historyLimit = plugin.getConfig().getInt("database.history-default-limit");
+        DbName = plugin.getConfig().getString("database.name", "database.db");
+        historyLimit = plugin.getConfig().getInt("database.history-default-limit", 20);
+        maxPoolSize = plugin.getConfig().getInt("database.max-pool-size", 2);
+
+        maxPlayerCache = plugin.getConfig().getInt("cache.max-player-in-cache");
+        expireTime = plugin.getConfig().getInt("cache.expire-time");
+
         maxWordCharacter = plugin.getConfig().getInt("database.max-word-length");
 
         backupDelay = plugin.getConfig().getLong("import-export.backup-delay") * 60 * 20;
@@ -137,7 +146,6 @@ public class ConfigManager {
         maxCaps = plugin.getConfig().getInt("caps-options.max-caps");
         minLetters = plugin.getConfig().getInt("caps-options.min-letters");
         messageDelay = (long) plugin.getConfig().getInt("message-delay") * 1000L;
-        intervalCheck = plugin.getConfig().getLong("check-interval");
 
     }
 
@@ -228,4 +236,5 @@ public class ConfigManager {
     private List<String> colorList(List<String> list) {
         return list.stream().map(this::color).toList();
     }
+
 }

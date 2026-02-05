@@ -39,8 +39,8 @@ public final class Moderation extends JavaPlugin {
 
     @Getter
     private final Cache<UUID, Long> chatCooldown = Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(getConfigManager().getMaxPlayerCache())
+            .expireAfterWrite(getConfigManager().getExpireTime(), TimeUnit.MINUTES)
             .build();
 
     @Getter
@@ -116,7 +116,7 @@ public final class Moderation extends JavaPlugin {
                 getImportExportManager().exportBlacklistJSON(callback);
                 getImportExportManager().exportWhitelistJSON(callback);
             }
-        }, 0L, getConfigManager().getBackupDelay());
+        }, 100L, getConfigManager().getBackupDelay());
     }
 
     private void createDir() {

@@ -37,7 +37,7 @@ public class DbManager {
         config.setJdbcUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
         config.setDriverClassName("org.sqlite.JDBC");
 
-        config.setMaximumPoolSize(3);
+        config.setMaximumPoolSize(plugin.getConfigManager().getMaxPoolSize());
         config.setConnectionTestQuery("SELECT 1");
         config.setPoolName("ModerationPool");
 

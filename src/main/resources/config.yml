@@ -4,8 +4,12 @@ license-key: "Wb5AQ0Q48DhMskSkwNxYmpwQKU2Wrrwh1h3mMjfG"
 database:
   name: "database.db"
   history-default-limit: 20
+  max-pool-size: 3
 
-check-interval: 30 #seconds
+cache:
+  max-players-in-cache: 1000
+  expire-time: 10 #minutes
+
 message-delay: 3 #seconds
 max-word-length: 20
 
